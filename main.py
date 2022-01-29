@@ -1,6 +1,6 @@
 from enum import Enum
-from Lib import ServerHandler
-from Lib import Hexagon
+from work import ServerHandler
+from work import Hexagon
 
 
 class Action(Enum):
