@@ -16,23 +16,19 @@ class Action(Enum):
 
 
 def send_login(game_server, name, password="", game=None, num_turns=None, num_players=1, is_observer=False):
-
     """Возвращает id текущего игрока"""
 
     data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
             "is_observer": is_observer}
-
     login = game_server.send_request(Action.LOGIN, data)
 
     print("-----LOGIN1: " + str(login))
     print()
 
-    player_id = login["idx"]
-    return player_id
+    return login["idx"]
 
 
 def pick_base_hex(base_hexes, vehicles):
-
     """Возвращает Hex базы если там нет ни одного танка"""
 
     for b in base_hexes:
@@ -52,72 +48,79 @@ def print_all_positions(game_state):
         vehicle_pos = v["position"]
         print(k + ": " + str(vehicle_pos))
 
-def get_firing_range(center_hex, firing_radius):
 
-    """Возвращает список шестиугольников в радиусе обстрела"""
 
-    hexes_in_firing_range = []
-    for q in range(-firing_radius, firing_radius + 1):
-        for r in range(max(-firing_radius, -q - firing_radius), min(+firing_radius, -q + firing_radius) + 1):
-            s = - q - r
-            if q != 0 or r != 0 or s != 0:
-                hexes_in_firing_range.append(center_hex + Hex(q, r, s))
-    return hexes_in_firing_range
-
-def shoot(game_server, player_id, vehicle_hex_pos, game_state):
-    firing_range = get_firing_range(vehicle_hex_pos, 2)
-    for k1, v1 in game_state["vehicles"].items():
-        if v1["player_id"] != player_id:
-            vehicle_pos_enemy = v1["position"]
+def shoot(game_server, player_id, tank_id, vehicle_hex_pos, game_state):
+    """Стреляет если в радиусе обстрела есть танк,
+    Возвращает False если танков нет"""
+    firing_range = vehicle_hex_pos.get_firing_range(2) #Получаем гексы в которые можем стрелять
+    for k, v in game_state["vehicles"].items():
+        if v["player_id"] != player_id: #перебираем все танки противников
+            vehicle_pos_enemy = v["position"]
             vehicle_hex_pos_enemy = Hex(vehicle_pos_enemy["x"], vehicle_pos_enemy["y"], vehicle_pos_enemy["z"])
-            if vehicle_hex_pos_enemy in firing_range:
-                shoot_action = {"vehicle_id": player_id, "target": vehicle_hex_pos_enemy.__dict__}
-                game_server.send_request(Action.SHOOT , shoot_action)
+
+            if vehicle_hex_pos_enemy.in_firing_range(firing_range): #проверяем можем ли стрельнуть в танк
+                shoot_action = {"vehicle_id": tank_id, "target": vehicle_hex_pos_enemy.__dict__}
+                game_server.send_request(Action.SHOOT, shoot_action)
                 return True
+    return False
 
-def move_to(game_server, player_id, base, game_state, move):
-    pass
 
-def game_action(game_server, player_id, base, game_state, move):
-    for k, v in game_state["vehicles"].items():  # ход каждым танком
-        if v["player_id"] == player_id:  # проверка принадлежнсти танка
-            vehicle_pos = v["position"]
+def move_to(game_server, vehicle_hex_pos, tank_id, base, game_state):
+    """Двигается в сторону базы если ничего не мешает,
+    возвращает False если не удается сдвинуться"""
+    base_pos = pick_base_hex(base, game_state["vehicles"])  # выбор hex базы для захвата
+    if not base_pos:  # вся база занята
+        return False
+    base_hex_pos = Hex(base_pos["x"], base_pos["y"], base_pos["z"])
+
+    # ход в сторону выбранного hex базы с дефолтной скоростью 2 и получение промежуточного hex
+    final_hex = vehicle_hex_pos.move_to(base_hex_pos, 2)
+    if hex_is_free(final_hex.__dict__, game_state["vehicles"]):
+        game_state["vehicles"][tank_id]["position"] = final_hex.__dict__
+        move_to = {"vehicle_id": tank_id, "target": final_hex.__dict__}
+        game_server.send_request(Action.MOVE, move_to)
+    else:
+        print("---------------HEX IS OCCUPIED!!!----------------")
+    return True
+
+
+def game_action(game_server, player_id, base, game_state):
+    for tank_id, tank_data in game_state["vehicles"].items():  # получение координат каждого танка
+        if tank_data["player_id"] == player_id:  # проверка принадлежнсти танка чтобы управлять только своими
+            vehicle_pos = tank_data["position"]
             vehicle_hex_pos = Hex(vehicle_pos["x"], vehicle_pos["y"], vehicle_pos["z"])
 
-            if not shoot(game_server, player_id, vehicle_hex_pos, game_state): #Проверка возможности выстрелить и стрельба
-                base_pos = pick_base_hex(base, game_state["vehicles"])  # выбор hex базы для захвата
-                if not base_pos:  # вся база занята
-                    break
-                base_hex_pos = Hex(base_pos["x"], base_pos["y"], base_pos["z"])
-
-                # ход в сторону выбранного hex базы с дефолтной скоростью 2 и получение промежуточного hex
-                final_hex = vehicle_hex_pos.move_to(base_hex_pos, 2)
-                if hex_is_free(final_hex.__dict__, game_state["vehicles"]):
-                    game_state["vehicles"][k]["position"] = final_hex.__dict__
-                    move["vehicle_id"] = k
-                    move["target"] = final_hex.__dict__
-                    game_server.send_request(Action.MOVE, move)
-                else:
-                    print("---------------HEX IS OCCUPIED!!!----------------")
+            if not shoot(game_server, player_id, tank_id, vehicle_hex_pos, game_state):  # Проверка возможности выстрелить и стрельба
+                move_to(game_server, vehicle_hex_pos, tank_id, base, game_state)    #едем если не можем стрелять
 
     game_server.send_request(Action.TURN)
 
 
 def main():
-    game_server = ServerHandler.ServerHandler()
-    player_id = send_login(game_server, name="Carlos")
+    game_server1 = ServerHandler.ServerHandler()
+    game_server2 = ServerHandler.ServerHandler()
+    player_id1 = send_login(game_server1, name="Carlos1", game="game1", num_players=2)
+    player_id2 = send_login(game_server2, name="Carlos2", game="game1")
 
-    game_map = game_server.send_request(Action.MAP)
+    game_map = game_server1.send_request(Action.MAP)
     base = game_map['content']['base']
 
-    game_state = game_server.send_request(Action.GAME_STATE)
-    move = {"vehicle_id": 1, "target": {"x": 0, "y": 0, "z": 0}}  # формат хода из доки
+    while True: #Игровой цикл пока не получим победителя от сервера
+        game_state = game_server1.send_request(Action.GAME_STATE)
+        if game_state['winner']:
+            print_all_positions(game_state)
+            game_server1.send_request(Action.LOGOUT)
+            game_server2.send_request(Action.LOGOUT)
+            break
 
-    while not game_state['winner']:
-        game_action(game_server, player_id, base, game_state, move)
-        game_state = game_server.send_request(Action.GAME_STATE)
+        if game_state["current_player_idx"] == player_id1:
+            game_action(game_server1, player_id1, base, game_state)
+        elif game_state["current_player_idx"] == player_id2:
+            game_action(game_server2, player_id2, base, game_state)
 
-    print_all_positions(game_state)
+
+
 
 
 if __name__ == "__main__":
