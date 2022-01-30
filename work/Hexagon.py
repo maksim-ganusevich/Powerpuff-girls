@@ -45,3 +45,29 @@ class Hex:
         if N <= speed_points:
             return b
         return self.__hex_lerp(b, 1.0 / N * speed_points).__hex_round()
+
+    def get_firing_range(self, firing_radius):
+        """Возвращает список шестиугольников в зоне обстрела"""
+        hexes_in_firing_range = []
+        for q in range(-firing_radius, firing_radius + 1):  # Находим все гексы в радиусе обстрела
+            for r in range(max(-firing_radius, -q - firing_radius), min(+firing_radius, -q + firing_radius) + 1):
+                s = - q - r
+                hexes_in_firing_range.append(self + Hex(q, r, s))
+
+        firing_radius -= 1
+        for q in range(-firing_radius, firing_radius + 1):  # удаляем все гексы в зоне обстрела 'радиус - 1'
+            for r in range(max(-firing_radius, -q - firing_radius), min(+firing_radius, -q + firing_radius) + 1):
+                s = - q - r
+                to_delete = self + Hex(q, r, s)
+                for item in hexes_in_firing_range:
+                    if item.__dict__ == to_delete.__dict__:
+                        hexes_in_firing_range.remove(item)
+                        break
+        return hexes_in_firing_range
+
+    def in_firing_range(self, firing_range):
+        for item in firing_range:
+            if self.x == item.x and self.y == item.y:
+                return True
+        return False
+

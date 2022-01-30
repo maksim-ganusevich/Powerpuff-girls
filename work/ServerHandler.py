@@ -16,10 +16,10 @@ class ServerHandler:
     __serverAddressPort = ("wgforge-srv.wargaming.net", 443)
     __bufferSize = 4096
 
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(ServerHandler, cls).__new__(cls)
-        return cls.instance
+    # def __new__(cls):
+    #     if not hasattr(cls, 'instance'):
+    #         cls.instance = super(ServerHandler, cls).__new__(cls)
+    #     return cls.instance
 
     def __init__(self):
         self.__TCPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
