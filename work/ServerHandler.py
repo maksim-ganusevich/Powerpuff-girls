@@ -16,11 +16,6 @@ class ServerHandler:
     __serverAddressPort = ("wgforge-srv.wargaming.net", 443)
     __bufferSize = 4096
 
-    # def __new__(cls):
-    #     if not hasattr(cls, 'instance'):
-    #         cls.instance = super(ServerHandler, cls).__new__(cls)
-    #     return cls.instance
-
     def __init__(self):
         self.__TCPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
         self.__TCPSocket.connect(self.__serverAddressPort)
@@ -29,8 +24,9 @@ class ServerHandler:
         self.__TCPSocket.close()
 
     def send_request(self, action, data=None):
-        # формат запроса: {action (4 bytes)} + {data length (4 bytes)} + {bytes of UTF-8 string with data in JSON format}
-        bytes_to_send = action.value.to_bytes(4, byteorder='little')
+        # формат запроса: {action (4 bytes)} + {data length (4 bytes)} +
+        # + {bytes of UTF-8 string with data in JSON format}
+        bytes_to_send = action.to_bytes(4, byteorder='little')
         data_length = 0
         if data:
             json_value = json.dumps(data, separators=(',', ':'))
@@ -46,8 +42,8 @@ class ServerHandler:
         buffer = b''
         data_length = None
         while True:
-            msgFromServer = self.__TCPSocket.recv(self.__bufferSize)
-            buffer += msgFromServer
+            msg_from_server = self.__TCPSocket.recv(self.__bufferSize)
+            buffer += msg_from_server
 
             if len(buffer) >= 8:  # получаем гарантированные первые 8 байт (result + data length)
                 if not data_length:
@@ -58,7 +54,7 @@ class ServerHandler:
         code_result = int.from_bytes(buffer[:4], "little")
         print("Result: " + str(Result(code_result)))
         print("Data length: " + str(data_length))
-        print("Full responce: " + str(buffer))
+        print("Full response: " + str(buffer))
 
         if Result(code_result) != Result.OKEY:
             return None
@@ -66,3 +62,15 @@ class ServerHandler:
         if data_length > 0:
             data = json.loads(buffer[8:].decode('utf-8'))
             return data
+
+    def send_login(self, name, password="", game=None, num_turns=None, num_players=1, is_observer=False):
+        """Возвращает id текущего игрока"""
+
+        data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
+                "is_observer": is_observer}
+        login = self.send_request(1, data)
+
+        print("-----LOGIN1: " + str(login))
+        print()
+
+        return login["idx"]
