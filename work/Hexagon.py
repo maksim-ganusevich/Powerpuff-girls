@@ -1,4 +1,5 @@
 class Hex:
+
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
@@ -10,11 +11,25 @@ class Hex:
     def __sub__(self, other):
         return Hex(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def distance(self, other):
-        vec = self - other
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    @staticmethod
+    def distance(a, b):
+        vec = a - b
         return (abs(vec.x) + abs(vec.y) + abs(vec.z)) / 2
 
-    def __hex_round(self):
+    @staticmethod
+    def lerp(a, b, t):  # for floats
+        return a + (b - a) * t
+
+    @staticmethod
+    def hex_lerp(a, b, t):  # for hexes
+        return Hex(Hex.lerp(a.x, b.x, t),
+                   Hex.lerp(a.y, b.y, t),
+                   Hex.lerp(a.z, b.z, t))
+
+    def hex_round(self):
         x = round(self.x)
         y = round(self.y)
         z = round(self.z)
@@ -32,42 +47,39 @@ class Hex:
 
         return Hex(x, y, z)
 
-    def __lerp(self, a, b, t):  # for floats
-        return a + (b - a) * t
+    # all hexes in the area with self as center
+    def get_hexes_in_range(self, n) -> []:
+        results = []
+        for x in range(-n, n+1):
+            for y in range(max(-n, -x-n), min(n, -x+n)+1):
+                z = -x - y
+                results.append(self + Hex(x, y, z))
+        return results
 
-    def __hex_lerp(self, other, t):  # for hexes
-        return Hex(self.__lerp(self.x, other.x, t),
-                   self.__lerp(self.y, other.y, t),
-                   self.__lerp(self.z, other.z, t))
+    # only hexes on the edge of the area
+    def get_hexes_of_circle(self, r) -> []:
+        results = []
+        x = -r
+        for y in range(0, r+1):
+            z = -x - y
+            results.append(self + Hex(x, y, z))
+            results.append(self + Hex(-x, y-r, z-r))
+        for x in range(-r+1, r):
+            y = max(-r, -x-r)
+            z = -x - y
+            results.append(self + Hex(x, y, z))
+            y = min(r, -x+r)
+            z = -x - y
+            results.append(self + Hex(x, y, z))
+        return results
 
-    def move_to(self, b, speed_points):
-        N = self.distance(b)
-        if N <= speed_points:
-            return b
-        return self.__hex_lerp(b, 1.0 / N * speed_points).__hex_round()
-
-    def get_firing_range(self, firing_radius):
-        """Возвращает список шестиугольников в зоне обстрела"""
-        hexes_in_firing_range = []
-        for q in range(-firing_radius, firing_radius + 1):  # Находим все гексы в радиусе обстрела
-            for r in range(max(-firing_radius, -q - firing_radius), min(+firing_radius, -q + firing_radius) + 1):
-                s = - q - r
-                hexes_in_firing_range.append(self + Hex(q, r, s))
-
-        firing_radius -= 1
-        for q in range(-firing_radius, firing_radius + 1):  # удаляем все гексы в зоне обстрела 'радиус - 1'
-            for r in range(max(-firing_radius, -q - firing_radius), min(+firing_radius, -q + firing_radius) + 1):
-                s = - q - r
-                to_delete = self + Hex(q, r, s)
-                for item in hexes_in_firing_range:
-                    if item.__dict__ == to_delete.__dict__:
-                        hexes_in_firing_range.remove(item)
-                        break
-        return hexes_in_firing_range
-
-    def in_firing_range(self, firing_range):
-        for item in firing_range:
-            if self.x == item.x and self.y == item.y:
-                return True
-        return False
-
+    def get_hexes_of_axes(self, d) -> []:
+        results = []
+        for i in range(1, d+1):
+            results.append(self + Hex(0, i, -i))
+            results.append(self + Hex(0, -i, i))
+            results.append(self + Hex(i, 0, -i))
+            results.append(self + Hex(-i, 0, i))
+            results.append(self + Hex(i, -i, 0))
+            results.append(self + Hex(-i, i, 0))
+        return results

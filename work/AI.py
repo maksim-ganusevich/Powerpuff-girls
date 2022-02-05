@@ -1,6 +1,7 @@
+import random
 from work import Player
 from work.Hexagon import Hex
-import random
+from work.Tanks import *
 
 
 class AI:
@@ -19,7 +20,12 @@ class AI:
         self.game_map = self.players[0].get_map()
         self.base = self.game_map['content']['base']
 
-    def shoot(self, player):
+    def shoot(self, player, tank, enemy_tanks):
+        firing_range = tank.get_firing_range()
+        for enemy in enemy_tanks:
+            if enemy.position in firing_range:
+                player.shoot(tank.id, enemy.position)
+                return True
         return False
 
     def hex_is_free(self, hex):
@@ -34,28 +40,52 @@ class AI:
             if self.hex_is_free(b):
                 return b
 
-    def move_to(self, player, pos, tank):
+    def move(self, player, tank):
         base_pos = self.pick_base_hex()
         if not base_pos:  # вся база занята
             return False
 
         base_hex_pos = Hex(base_pos["x"], base_pos["y"], base_pos["z"])
-        final_hex = pos.move_to(base_hex_pos, 1)
+        final_hex = tank.move(base_hex_pos)
+
         if self.hex_is_free(final_hex.__dict__):
-            self.game_state["vehicles"][tank]["position"] = final_hex.__dict__
-            move_to = {"vehicle_id": tank, "target": final_hex.__dict__}
+            self.game_state["vehicles"][tank.id]["position"] = final_hex.__dict__
+            move_to = {"vehicle_id": tank.id, "target": final_hex.__dict__}
             player.move(move_to)
         else:
             print("---------------HEX IS OCCUPIED!!!----------------")
         return True
 
-    def game_action(self, player):
+    def construct_tank(self, tank_id, tank_data) -> (Tank, int):
+        # tanks move order: SPG, LT, HТ, MТ, AtSPG
+        tank_types = {
+            "spg": (SPG, 0),
+            "light_tank": (LightTank, 1),
+            "heavy_tank": (HeavyTank, 2),
+            "medium_tank": (MediumTank, 3),
+            "at_spg": (AtSPG, 4)
+        }
+        t_type, t_move_order = tank_types[tank_data["vehicle_type"]]
+        return t_type(tank_id, tank_data["health"], tank_data["position"]), t_move_order
+    
+    def get_tank_lists(self, player) -> (([], int), []):
+        player_tanks = []
+        enemy_tanks = []
         for tank_id, tank_data in self.game_state["vehicles"].items():
+            tank, tank_move_order = self.construct_tank(tank_id, tank_data)
             if tank_data["player_id"] == player.id:
-                vehicle_pos = tank_data["position"]
-                vehicle_hex_pos = Hex(vehicle_pos["x"], vehicle_pos["y"], vehicle_pos["z"])
-                if not self.shoot(player):
-                    self.move_to(player, vehicle_hex_pos, tank_id)
+                player_tanks.append((tank_move_order, tank))
+            else:
+                enemy_tanks.append(tank)
+        return player_tanks, enemy_tanks
+
+    def game_action(self, player):
+        player_tanks, enemy_tanks = self.get_tank_lists(player)
+        player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
+
+        for tank_move_order, tank in player.tanks:
+            if not self.shoot(player, tank, enemy_tanks):
+                self.move(player, tank)
 
         player.turn()
 
