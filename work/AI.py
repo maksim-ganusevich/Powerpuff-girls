@@ -1,5 +1,6 @@
 import random
-from work import Player
+from time import sleep
+
 from work.Hexagon import Hex
 from work.Tanks import *
 
@@ -20,10 +21,20 @@ class AI:
         self.game_map = self.players[0].get_map()
         self.base = self.game_map['content']['base']
 
+    def check_neutrality(self, player, enemy_tank):
+        attack_matrix = self.game_state["attack_matrix"]
+        id_all_players = list(attack_matrix.keys())
+        id_all_players.remove(str(player.id))
+        id_all_players.remove(str(enemy_tank.owner))
+        id_third_player = id_all_players[0]
+        if player.id in attack_matrix[str(enemy_tank.owner)] or enemy_tank.owner not in attack_matrix[id_third_player]:
+            return True
+        return False
+
     def shoot(self, player, tank, enemy_tanks):
         firing_range = tank.get_firing_range()
         for enemy in enemy_tanks:
-            if enemy.position in firing_range:
+            if enemy.position in firing_range and self.check_neutrality(player, enemy):
                 player.shoot(tank.id, enemy.position)
                 return True
         return False
@@ -56,7 +67,8 @@ class AI:
             print("---------------HEX IS OCCUPIED!!!----------------")
         return True
 
-    def construct_tank(self, tank_id, tank_data) -> (Tank, int):
+    @staticmethod
+    def construct_tank(tank_id, tank_data) -> (Tank, int):
         # tanks move order: SPG, LT, HТ, MТ, AtSPG
         tank_types = {
             "spg": (SPG, 0),
@@ -66,8 +78,8 @@ class AI:
             "at_spg": (AtSPG, 4)
         }
         t_type, t_move_order = tank_types[tank_data["vehicle_type"]]
-        return t_type(tank_id, tank_data["health"], tank_data["position"]), t_move_order
-    
+        return t_type(tank_id, tank_data["health"], tank_data["position"], tank_data["player_id"]), t_move_order
+
     def get_tank_lists(self, player) -> (([], int), []):
         player_tanks = []
         enemy_tanks = []
@@ -87,7 +99,12 @@ class AI:
             if not self.shoot(player, tank, enemy_tanks):
                 self.move(player, tank)
 
-        player.turn()
+    def send_turn(self):
+        for player in self.players:
+            player.turn(wait_r=False)
+        for player in self.players:
+            print()
+            player.turn(send_r=False)
 
     def start_game(self):
         self.game_state = self.players[0].get_state()
@@ -97,12 +114,12 @@ class AI:
                 self.finish_game()
                 break
 
-            for _ in range(len(self.players)):
-                for pl in self.players:
-                    if self.game_state["current_player_idx"] == pl.id:
-                        self.game_action(pl)
-                        self.game_state = pl.get_state()
-                        break
+            for pl in self.players:
+                if self.game_state["current_player_idx"] == pl.id:
+                    self.game_action(pl)
+                    self.send_turn()
+                    self.game_state = pl.get_state()
+                    break
 
     def finish_game(self):
         for pl in self.players:

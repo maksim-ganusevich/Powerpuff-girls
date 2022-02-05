@@ -21,8 +21,8 @@ class Player:
     def set_id(self, id):
         self.id = id
 
-    def turn(self):
-        self.server.send_request(6)
+    def turn(self, send_r=True, wait_r=True):
+        self.server.send_request(6, send_req=send_r, wait_res=wait_r)
 
     def move(self, move_to):
         self.server.send_request(101, move_to)
