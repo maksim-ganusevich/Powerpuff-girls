@@ -48,7 +48,7 @@ class Hex:
         return Hex(x, y, z)
 
     # all hexes in the area with self as center
-    def get_hexes_in_range(self, n) -> []:
+    def get_hexes_in_range(self, n: int) -> []:
         results = []
         for x in range(-n, n+1):
             for y in range(max(-n, -x-n), min(n, -x+n)+1):
@@ -57,7 +57,7 @@ class Hex:
         return results
 
     # only hexes on the edge of the area
-    def get_hexes_of_circle(self, r) -> []:
+    def get_hexes_of_circle(self, r: int) -> []:
         results = []
         x = -r
         for y in range(0, r+1):

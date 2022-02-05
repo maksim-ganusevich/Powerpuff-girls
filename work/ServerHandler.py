@@ -24,7 +24,7 @@ class ServerHandler:
     def __del__(self):
         self.__TCPSocket.close()
 
-    def send_request(self, action, data=None, send_req=True, wait_res = True):
+    def send_request(self, action: int, data: dict = None, send_req=True, wait_res=True) -> dict:
         # формат запроса: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
@@ -66,7 +66,8 @@ class ServerHandler:
                 data = json.loads(buffer[8:].decode('utf-8'))
                 return data
 
-    def send_login(self, name, password="", game=None, num_turns=None, num_players=1, is_observer=False):
+    def send_login(self, name: str, password="", game: str = None, num_turns: int = None, num_players=1,
+                   is_observer=False) -> int:
         """Возвращает id текущего игрока"""
 
         data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
@@ -78,6 +79,6 @@ class ServerHandler:
 
         return login["idx"]
 
-    def send_shoot(self, id, shoot_pos):
+    def send_shoot(self, id: int, shoot_pos: dict):
         data = {"vehicle_id": id, "target": shoot_pos}
         self.send_request(102, data)
