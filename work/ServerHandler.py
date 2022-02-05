@@ -74,3 +74,7 @@ class ServerHandler:
         print()
 
         return login["idx"]
+
+    def send_shoot(self, id, shoot_pos):
+        data = {"vehicle_id": id, "target": shoot_pos}
+        self.send_request(102, data)

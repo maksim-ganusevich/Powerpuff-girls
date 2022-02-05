@@ -27,5 +27,8 @@ class Player:
     def move(self, move_to):
         self.server.send_request(101, move_to)
 
+    def shoot(self, id, shoot_to):
+        self.server.send_shoot(id, shoot_to.__dict__)
+
     def logout(self):
         self.server.send_request(2)
