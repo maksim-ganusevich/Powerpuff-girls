@@ -38,12 +38,11 @@ class ServerHandler:
     def __del__(self):
         self.__TCPSocket.close()
 
-        
-    def send_request(self, action, data=None, send_req=True, wait_res = True):
+    def send_request(self, action, data=None, send_req=True, wait_res=True):
         # request format: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
-            bytes_to_send = code_action.to_bytes(4, byteorder='little')
+            bytes_to_send = action.to_bytes(4, byteorder='little')
             data_length = 0
             if data:
                 json_value = json.dumps(data, separators=(',', ':'))
@@ -71,7 +70,7 @@ class ServerHandler:
             print_log = logging.info
             if code_result != 0:
                 print_log = logging.error
-            print_log('\n---' + str(Action(code_action)) + '---' +
+            print_log('\n---' + str(Action(action)) + '---' +
                       "\nResult: " + str(Result(code_result)) +
                       "\nData length: " + str(data_length) +
                       "\nFull response: " + str(buffer))
@@ -83,8 +82,7 @@ class ServerHandler:
                 data = json.loads(buffer[8:].decode('utf-8'))
                 return data
 
-
-        """returns id of the current player"""
+    # returns id of the current player
     def send_login(self, name: str, password="", game: str = None, num_turns: int = None, num_players=1,
                    is_observer=False) -> int:
         data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,

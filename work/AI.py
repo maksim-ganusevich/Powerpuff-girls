@@ -8,7 +8,7 @@ logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt=
 
 
 class AI:
-    def __init__(self, players: list[Player]):
+    def __init__(self, players: "list[Player]"):
         self.players = players
         random.shuffle(self.players)
         self.game_name = self.players[0].name + self.players[1].name + self.players[2].name
@@ -23,6 +23,7 @@ class AI:
         self.game_map = self.players[0].get_map()
         self.base = self.game_map['content']['base']
 
+    # checking the possibility of firing according to the rule of neutrality
     def check_neutrality(self, player: Player, enemy_tank: Tank) -> bool:
         attack_matrix = self.game_state["attack_matrix"]
         id_all_players = list(attack_matrix.keys())
@@ -33,7 +34,7 @@ class AI:
             return True
         return False
 
-    def shoot(self, player: Player, tank: Tank, enemy_tanks: list[Tank]) -> bool:
+    def shoot(self, player: Player, tank: Tank, enemy_tanks: "list[Tank]") -> bool:
         firing_range = tank.get_firing_range()
         for enemy in enemy_tanks:
             if enemy.position in firing_range and self.check_neutrality(player, enemy):
@@ -46,7 +47,6 @@ class AI:
             if v["position"] == hex:
                 return False
         return True
-
 
     def pick_base_hex(self) -> dict:
         # Возвращает Hex базы если там нет ни одного танка
@@ -94,7 +94,7 @@ class AI:
                 enemy_tanks.append(tank)
         return player_tanks, enemy_tanks
 
-    def game_action(self, player: Player) -> None:
+    def make_action(self, player: Player) -> None:
         player_tanks, enemy_tanks = self.get_tank_lists(player)
         player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
 
@@ -118,7 +118,7 @@ class AI:
 
             for pl in self.players:
                 if self.game_state["current_player_idx"] == pl.id:
-                    self.game_action(pl)
+                    self.make_action(pl)
                     self.send_turn()
                     self.game_state = pl.get_state()
                     break

@@ -25,7 +25,7 @@ class Tank(ABC):
     def get_firing_range(self):
         pass
 
-    def in_firing_range(self, firing_range: dict[Hex]) -> bool:
+    def in_firing_range(self, firing_range: "dict[Hex]") -> bool:
         for item in firing_range:
             if self.position.x == item.x and self.position.y == item.y:
                 return True

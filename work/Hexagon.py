@@ -89,7 +89,7 @@ class Hex:
             Hex(-1, 0, +1), Hex(-1, +1, 0), Hex(0, +1, -1),
         ]
         results = []
-        for i in range(1, d+1):
+        for i in range(1, d + 1):
             for dir in directions:
                 res = self + dir * i
                 if res.in_map_boundaries():
