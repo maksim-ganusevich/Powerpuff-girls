@@ -18,6 +18,9 @@ class Hex:
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __repr__(self):
+        return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
+
     @staticmethod
     def distance(a, b):
         vec = a - b
@@ -52,7 +55,7 @@ class Hex:
         return Hex(x, y, z)
 
     def in_map_boundaries(self):
-        return max(self.x, self.y, self.z) <= self.__map_size
+        return max(abs(self.x), abs(self.y), abs(self.z)) <= self.__map_size
 
     # all hexes in the area with self as center
     def get_hexes_in_range(self, n) -> []:

@@ -109,7 +109,7 @@ class AI:
         self.game_state = self.players[0].get_state()
 
         while True:
-            if self.game_state['winner']:
+            if self.game_state['finished']:
                 self.finish_game()
                 break
 

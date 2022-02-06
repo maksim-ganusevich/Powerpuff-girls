@@ -15,8 +15,11 @@ class Tank(ABC):
     def move(self, target) -> Hex:
         N = Hex.distance(self.position, target)
         if N <= self.sp:
+            self.position = target
             return target
-        return Hex.hex_lerp(self.position, target, 1.0 / N * self.sp).hex_round()
+        final_hex = Hex.hex_lerp(self.position, target, 1.0 / N * self.sp).hex_round()
+        self.position = final_hex
+        return final_hex
 
     @abstractmethod
     def get_firing_range(self):
