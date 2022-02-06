@@ -67,7 +67,7 @@ class ServerHandler:
                         break
 
             code_result = int.from_bytes(buffer[:4], "little")
-            print_log = print
+            print_log = logging.info
             if code_result != 0:
                 print_log = logging.error
             print_log('\n---' + str(Action(code_action)) + '---' +
