@@ -1,6 +1,9 @@
 import json
 import socket
+import logging
 from enum import Enum
+
+logging.basicConfig(level=logging.DEBUG, format='\n%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
 class Result(Enum):
@@ -10,6 +13,18 @@ class Result(Enum):
     INAPPROPRIATE_GAME_STATE = 3
     TIMEOUT = 4
     INTERNAL_SERVER_ERROR = 500
+
+
+class Action(Enum):
+    LOGIN = 1
+    LOGOUT = 2
+    MAP = 3
+    GAME_STATE = 4
+    GAME_ACTIONS = 5
+    TURN = 6
+    CHAT = 100
+    MOVE = 101
+    SHOOT = 102
 
 
 class ServerHandler:
@@ -23,11 +38,12 @@ class ServerHandler:
     def __del__(self):
         self.__TCPSocket.close()
 
+        
     def send_request(self, action, data=None, send_req=True, wait_res = True):
         # request format: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
-            bytes_to_send = action.to_bytes(4, byteorder='little')
+            bytes_to_send = code_action.to_bytes(4, byteorder='little')
             data_length = 0
             if data:
                 json_value = json.dumps(data, separators=(',', ':'))
@@ -35,8 +51,6 @@ class ServerHandler:
                 bytes_to_send += data_length.to_bytes(4, byteorder='little') + bytes(json_value.encode('utf-8'))
             else:
                 bytes_to_send += data_length.to_bytes(4, byteorder='little')
-            print('\n---' + str(action) + '---')
-            print('Sending: ' + repr(bytes_to_send))
             self.__TCPSocket.sendall(bytes_to_send)
 
         # receiving answer
@@ -54,9 +68,13 @@ class ServerHandler:
                         break
 
             code_result = int.from_bytes(buffer[:4], "little")
-            print("Result: " + str(Result(code_result)))
-            print("Data length: " + str(data_length))
-            print("Full response: " + str(buffer))
+            print_log = logging.info
+            if code_result != 0:
+                print_log = logging.error
+            print_log('\n---' + str(Action(code_action)) + '---' +
+                      "\nResult: " + str(Result(code_result)) +
+                      "\nData length: " + str(data_length) +
+                      "\nFull response: " + str(buffer))
 
             if Result(code_result) != Result.OKEY:
                 return None
@@ -65,18 +83,15 @@ class ServerHandler:
                 data = json.loads(buffer[8:].decode('utf-8'))
                 return data
 
-    def send_login(self, name, password="", game=None, num_turns=None, num_players=1, is_observer=False):
-        """returns id of the current player"""
 
+        """returns id of the current player"""
+    def send_login(self, name: str, password="", game: str = None, num_turns: int = None, num_players=1,
+                   is_observer=False) -> int:
         data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}
         login = self.send_request(1, data)
-
-        print("-----LOGIN1: " + str(login))
-        print()
-
         return login["idx"]
 
-    def send_shoot(self, id, shoot_pos):
+    def send_shoot(self, id: int, shoot_pos: dict):
         data = {"vehicle_id": id, "target": shoot_pos}
         self.send_request(102, data)
