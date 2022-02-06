@@ -1,5 +1,4 @@
 from .Tank import Tank
-from work.Hexagon import Hex
 
 
 class SPG(Tank):

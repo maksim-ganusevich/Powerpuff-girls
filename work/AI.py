@@ -47,6 +47,7 @@ class AI:
                 return False
         return True
 
+
     def pick_base_hex(self) -> dict:
         # Возвращает Hex базы если там нет ни одного танка
         for b in self.base:
@@ -55,7 +56,7 @@ class AI:
 
     def move(self, player: Player, tank: Tank) -> bool:
         base_pos = self.pick_base_hex()
-        if not base_pos:  # вся база занята
+        if not base_pos:  # base is occupied
             return False
 
         base_hex_pos = Hex(base_pos["x"], base_pos["y"], base_pos["z"])
@@ -111,7 +112,7 @@ class AI:
         self.game_state = self.players[0].get_state()
 
         while True:
-            if self.game_state['winner']:
+            if self.game_state['finished']:
                 self.finish_game()
                 break
 

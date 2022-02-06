@@ -1,4 +1,5 @@
 class Hex:
+    __map_size = 11
 
     def __init__(self, x, y, z):
         self.x = x
@@ -11,8 +12,14 @@ class Hex:
     def __sub__(self, other):
         return Hex(self.x - other.x, self.y - other.y, self.z - other.z)
 
+    def __mul__(self, other):
+        return Hex(self.x * other, self.y * other, self.z * other)
+
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    def __repr__(self):
+        return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
 
     @staticmethod
     def distance(a, b):
@@ -47,6 +54,9 @@ class Hex:
 
         return Hex(x, y, z)
 
+    def in_map_boundaries(self):
+        return max(abs(self.x), abs(self.y), abs(self.z)) <= self.__map_size
+
     # all hexes in the area with self as center
     def get_hexes_in_range(self, n: int) -> []:
         results = []
@@ -74,12 +84,14 @@ class Hex:
         return results
 
     def get_hexes_of_axes(self, d) -> []:
+        directions = [
+            Hex(+1, 0, -1), Hex(+1, -1, 0), Hex(0, -1, +1),
+            Hex(-1, 0, +1), Hex(-1, +1, 0), Hex(0, +1, -1),
+        ]
         results = []
-        for i in range(1, d + 1):
-            results.append(self + Hex(0, i, -i))
-            results.append(self + Hex(0, -i, i))
-            results.append(self + Hex(i, 0, -i))
-            results.append(self + Hex(-i, 0, i))
-            results.append(self + Hex(i, -i, 0))
-            results.append(self + Hex(-i, i, 0))
+        for i in range(1, d+1):
+            for dir in directions:
+                res = self + dir * i
+                if res.in_map_boundaries():
+                    results.append(res)
         return results

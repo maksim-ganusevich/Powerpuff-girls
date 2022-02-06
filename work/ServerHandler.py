@@ -38,8 +38,9 @@ class ServerHandler:
     def __del__(self):
         self.__TCPSocket.close()
 
-    def send_request(self, code_action: int, data: dict = None, send_req=True, wait_res=True) -> dict:
-        # формат запроса: {action (4 bytes)} + {data length (4 bytes)} +
+        
+    def send_request(self, action, data=None, send_req=True, wait_res = True):
+        # request format: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
             bytes_to_send = code_action.to_bytes(4, byteorder='little')
@@ -52,7 +53,7 @@ class ServerHandler:
                 bytes_to_send += data_length.to_bytes(4, byteorder='little')
             self.__TCPSocket.sendall(bytes_to_send)
 
-        # получение ответа
+        # receiving answer
         if wait_res:
             buffer = b''
             data_length = None
@@ -60,10 +61,10 @@ class ServerHandler:
                 msg_from_server = self.__TCPSocket.recv(self.__bufferSize)
                 buffer += msg_from_server
 
-                if len(buffer) >= 8:  # получаем гарантированные первые 8 байт (result + data length)
+                if len(buffer) >= 8:  # getting first 8 bytes (result + data_length)
                     if not data_length:
                         data_length = int.from_bytes(buffer[4:8], "little")
-                    if len(buffer) >= data_length + 8:  # получаем доп. данные размера data_length
+                    if len(buffer) >= data_length + 8:  # extra data with the size of data_length
                         break
 
             code_result = int.from_bytes(buffer[:4], "little")
@@ -82,10 +83,10 @@ class ServerHandler:
                 data = json.loads(buffer[8:].decode('utf-8'))
                 return data
 
+
+        """returns id of the current player"""
     def send_login(self, name: str, password="", game: str = None, num_turns: int = None, num_players=1,
                    is_observer=False) -> int:
-        """Возвращает id текущего игрока"""
-
         data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}
         login = self.send_request(1, data)
