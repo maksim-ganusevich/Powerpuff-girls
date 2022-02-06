@@ -1,8 +1,10 @@
 import random
-from time import sleep
 from work.Player import Player
 from work.Hexagon import Hex
 from work.Tanks import *
+import logging
+
+logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
 class AI:
@@ -64,7 +66,7 @@ class AI:
             move_to = {"vehicle_id": tank.id, "target": final_hex.__dict__}
             player.move(move_to)
         else:
-            print("---------------HEX IS OCCUPIED!!!----------------")
+            logging.warning(msg="HEX IS OCCUPIED!!!")
         return True
 
     @staticmethod
@@ -103,7 +105,6 @@ class AI:
         for player in self.players:
             player.turn(wait_r=False)
         for player in self.players:
-            print()
             player.turn(send_r=False)
 
     def start_game(self) -> None:

@@ -50,8 +50,8 @@ class Hex:
     # all hexes in the area with self as center
     def get_hexes_in_range(self, n: int) -> []:
         results = []
-        for x in range(-n, n+1):
-            for y in range(max(-n, -x-n), min(n, -x+n)+1):
+        for x in range(-n, n + 1):
+            for y in range(max(-n, -x - n), min(n, -x + n) + 1):
                 z = -x - y
                 results.append(self + Hex(x, y, z))
         return results
@@ -60,22 +60,22 @@ class Hex:
     def get_hexes_of_circle(self, r: int) -> []:
         results = []
         x = -r
-        for y in range(0, r+1):
+        for y in range(0, r + 1):
             z = -x - y
             results.append(self + Hex(x, y, z))
-            results.append(self + Hex(-x, y-r, z-r))
-        for x in range(-r+1, r):
-            y = max(-r, -x-r)
+            results.append(self + Hex(-x, y - r, z - r))
+        for x in range(-r + 1, r):
+            y = max(-r, -x - r)
             z = -x - y
             results.append(self + Hex(x, y, z))
-            y = min(r, -x+r)
+            y = min(r, -x + r)
             z = -x - y
             results.append(self + Hex(x, y, z))
         return results
 
     def get_hexes_of_axes(self, d) -> []:
         results = []
-        for i in range(1, d+1):
+        for i in range(1, d + 1):
             results.append(self + Hex(0, i, -i))
             results.append(self + Hex(0, -i, i))
             results.append(self + Hex(i, 0, -i))
