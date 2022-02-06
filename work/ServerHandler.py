@@ -1,6 +1,5 @@
 import json
 import socket
-from time import sleep
 from enum import Enum
 
 
@@ -25,7 +24,7 @@ class ServerHandler:
         self.__TCPSocket.close()
 
     def send_request(self, action, data=None, send_req=True, wait_res = True):
-        # формат запроса: {action (4 bytes)} + {data length (4 bytes)} +
+        # request format: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
             bytes_to_send = action.to_bytes(4, byteorder='little')
@@ -40,7 +39,7 @@ class ServerHandler:
             print('Sending: ' + repr(bytes_to_send))
             self.__TCPSocket.sendall(bytes_to_send)
 
-        # получение ответа
+        # receiving answer
         if wait_res:
             buffer = b''
             data_length = None
@@ -48,10 +47,10 @@ class ServerHandler:
                 msg_from_server = self.__TCPSocket.recv(self.__bufferSize)
                 buffer += msg_from_server
 
-                if len(buffer) >= 8:  # получаем гарантированные первые 8 байт (result + data length)
+                if len(buffer) >= 8:  # getting first 8 bytes (result + data_length)
                     if not data_length:
                         data_length = int.from_bytes(buffer[4:8], "little")
-                    if len(buffer) >= data_length + 8:  # получаем доп. данные размера data_length
+                    if len(buffer) >= data_length + 8:  # extra data with the size of data_length
                         break
 
             code_result = int.from_bytes(buffer[:4], "little")
@@ -67,7 +66,7 @@ class ServerHandler:
                 return data
 
     def send_login(self, name, password="", game=None, num_turns=None, num_players=1, is_observer=False):
-        """Возвращает id текущего игрока"""
+        """returns id of the current player"""
 
         data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}

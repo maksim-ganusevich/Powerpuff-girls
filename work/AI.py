@@ -1,5 +1,4 @@
 import random
-from time import sleep
 
 from work.Hexagon import Hex
 from work.Tanks import *
@@ -46,14 +45,14 @@ class AI:
         return True
 
     def pick_base_hex(self):
-        # Возвращает Hex базы если там нет ни одного танка
+        # returns any free base hex
         for b in self.base:
             if self.hex_is_free(b):
                 return b
 
     def move(self, player, tank):
         base_pos = self.pick_base_hex()
-        if not base_pos:  # вся база занята
+        if not base_pos:  # base is occupied
             return False
 
         base_hex_pos = Hex(base_pos["x"], base_pos["y"], base_pos["z"])
