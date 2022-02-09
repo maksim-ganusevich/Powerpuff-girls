@@ -21,6 +21,9 @@ class Hex:
     def __repr__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
 
+    def to_dict(self):
+        return {'x': self.x, 'y': self.y, 'z': self.z}
+
     @staticmethod
     def distance(a, b):
         vec = a - b
@@ -58,29 +61,35 @@ class Hex:
         return max(abs(self.x), abs(self.y), abs(self.z)) <= self.__map_size
 
     # all hexes in the area with self as center
-    def get_hexes_in_range(self, n: int) -> []:
+    def get_hexes_in_range(self, n) -> []:
         results = []
-        for x in range(-n, n + 1):
-            for y in range(max(-n, -x - n), min(n, -x + n) + 1):
-                z = -x - y
-                results.append(self + Hex(x, y, z))
+        for x in range(-n, n+1):
+            for y in range(max(-n, -x-n), min(n, -x+n)+1):
+                res = self + Hex(x, y, -x-y)
+                if res.in_map_boundaries():
+                    results.append(res)
         return results
 
     # only hexes on the edge of the area
-    def get_hexes_of_circle(self, r: int) -> []:
+    def get_hexes_of_circle(self, r) -> []:
         results = []
         x = -r
-        for y in range(0, r + 1):
-            z = -x - y
-            results.append(self + Hex(x, y, z))
-            results.append(self + Hex(-x, y - r, z - r))
-        for x in range(-r + 1, r):
-            y = max(-r, -x - r)
-            z = -x - y
-            results.append(self + Hex(x, y, z))
-            y = min(r, -x + r)
-            z = -x - y
-            results.append(self + Hex(x, y, z))
+        for y in range(0, r+1):  # straight lines on both edges
+            res1 = self + Hex(x, y, -x-y)
+            res2 = self + Hex(-x, y-r, -x-y-r)
+            if res1.in_map_boundaries():
+                results.append(res1)
+            if res2.in_map_boundaries():
+                results.append(res2)
+        for x in range(-r+1, r):  # top and bottom hexes in the middle
+            y = max(-r, -x-r)
+            res1 = self + Hex(x, y, -x-y)
+            y = min(r, -x+r)
+            res2 = self + Hex(x, y, -x-y)
+            if res1.in_map_boundaries():
+                results.append(res1)
+            if res2.in_map_boundaries():
+                results.append(res2)
         return results
 
     def get_hexes_of_axes(self, d) -> []:
