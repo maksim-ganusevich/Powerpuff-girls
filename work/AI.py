@@ -1,8 +1,9 @@
 import random
+import logging
 from work.Player import Player
 from work.Hexagon import Hex
 from work.Tanks import *
-import logging
+from work.Map import Map
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
@@ -12,17 +13,15 @@ class AI:
         self.players = players
         random.shuffle(self.players)
         self.game_name = self.players[0].name + self.players[1].name + self.players[2].name
-        self.game_map = None
-        self.base = []
+        self.game_map = Map()
         self.game_state = None
 
     def connect(self) -> None:
         self.players[0].connect(self.game_name, 3)
         self.players[1].connect(self.game_name)
         self.players[2].connect(self.game_name)
-        self.game_map = self.players[0].get_map()
-        for b in self.game_map['content']['base']:
-            self.base.append(Hex(b['x'], b['y'], b['z']))
+        map_dict = self.players[0].get_map()
+        self.game_map.set_values(map_dict['size'], map_dict['content']['base'], map_dict['content']['obstacle'])
 
     # checking the possibility of firing according to the rule of neutrality
     def check_neutrality(self, player: Player, enemy_tank: Tank) -> bool:
@@ -52,7 +51,7 @@ class AI:
 
     def pick_base_hex(self) -> Hex:
         # returns any free hex
-        for b in self.base:
+        for b in self.game_map.base:
             if self.hex_is_free(b):
                 return b
 
