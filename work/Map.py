@@ -59,7 +59,7 @@ def get_hexes_in_range(center, n) -> []:
     for x in range(-n, n+1):
         for y in range(max(-n, -x-n), min(n, -x+n)+1):
             res = center + Hex(x, y, -x-y)
-            if in_map_boundaries(res):
+            if in_map_boundaries(res) and res not in obstacles:
                 results.append(res)
     return results
 
@@ -71,21 +71,23 @@ def get_hexes_of_circle(center, r) -> []:
     for y in range(0, r):
         vector = Hex(x, y, -x-y)
         res = center + vector
-        if in_map_boundaries(res):
+        if in_map_boundaries(res) and res not in obstacles:
             results.append(res)
         for i in range(5):
             vector = Hex(-vector.y, -vector.z, -vector.x)  # rotate 60 degrees
             res = center + vector
-            if in_map_boundaries(res):
+            if in_map_boundaries(res) and res not in obstacles:
                 results.append(res)
     return results
 
 
 def get_hexes_of_axes(center, d) -> []:
     results = []
-    for i in range(1, d + 1):
-        for dir in directions:
+    for dir in directions:
+        for i in range(1, d + 1):
             res = center + dir * i
+            if res in obstacles:
+                break  # stop looking in direction of obstacle
             if in_map_boundaries(res):
                 results.append(res)
     return results
