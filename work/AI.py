@@ -3,7 +3,7 @@ import logging
 from work.Player import Player
 from work.Hexagon import Hex
 from work.Tanks import *
-from work.Map import Map
+from work import Map
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
@@ -13,7 +13,6 @@ class AI:
         self.players = players
         random.shuffle(self.players)
         self.game_name = self.players[0].name + self.players[1].name + self.players[2].name
-        self.game_map = Map()
         self.game_state = None
 
     def connect(self) -> None:
@@ -21,7 +20,8 @@ class AI:
         self.players[1].connect(self.game_name)
         self.players[2].connect(self.game_name)
         map_dict = self.players[0].get_map()
-        self.game_map.set_values(map_dict['size'], map_dict['content']['base'], map_dict['content']['obstacle'])
+        Map.init_values(map_dict['size'], map_dict['content']['base'],
+                        map_dict['content']['obstacle'])
 
     # checking the possibility of firing according to the rule of neutrality
     def check_neutrality(self, player: Player, enemy_tank: Tank) -> bool:
@@ -42,17 +42,10 @@ class AI:
                 return True
         return False
 
-    def hex_is_free(self, hex: Hex) -> bool:
-        for v in self.game_state["vehicles"].values():
-            pos_hex = Hex(v["position"]["x"], v["position"]["y"], v["position"]["z"])
-            if pos_hex == hex:
-                return False
-        return True
-
-    def pick_base_hex(self) -> Hex:
-        # returns any free hex
-        for b in self.game_map.base:
-            if self.hex_is_free(b):
+    @staticmethod
+    def pick_base_hex() -> Hex:
+        for b in Map.base:
+            if Map.hex_is_free(b):
                 return b
 
     def move(self, player: Player, tank: Tank) -> bool:
@@ -60,14 +53,14 @@ class AI:
         if not base_pos:  # base is occupied
             return False
 
-        final_hex = tank.move(base_pos)
-
-        if self.hex_is_free(final_hex):
-            self.game_state["vehicles"][tank.id]["position"] = final_hex.to_dict()
-            move_to = {"vehicle_id": tank.id, "target": final_hex.to_dict()}
+        prev_pos = tank.position
+        if tank.move(base_pos):
+            Map.update_vehicle(prev_pos, tank.position)
+            move_to = {"vehicle_id": tank.id, "target": tank.position.to_dict()}
             player.move(move_to)
         else:
-            logging.warning(msg="HEX IS OCCUPIED!!!")
+            logging.warning(msg="Hexes in the way are occupied!")
+            return False
         return True
 
     @staticmethod
@@ -86,6 +79,8 @@ class AI:
     def get_tank_lists(self, player: Player) -> (([], int), []):
         player_tanks = []
         enemy_tanks = []
+        Map.set_vehicles(self.game_state["vehicles"].values())
+
         for tank_id, tank_data in self.game_state["vehicles"].items():
             tank, tank_move_order = self.construct_tank(tank_id, tank_data)
             if tank_data["player_id"] == player.id:

@@ -17,8 +17,14 @@ class Hex:
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __lt__(self, other):
+        return max(abs(self.x), abs(self.y), abs(self.z)) <= max(abs(other.x), abs(other.y), abs(other.z))
+
     def __repr__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
+
+    def __hash__(self):
+        return hash(repr(self))
 
     def to_dict(self):
         return {'x': self.x, 'y': self.y, 'z': self.z}
