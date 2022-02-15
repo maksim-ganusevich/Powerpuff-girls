@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from work.Hexagon import Hex
+from work import Astar
 
 
 class Tank(ABC):
@@ -12,14 +13,12 @@ class Tank(ABC):
         self.position = Hex(position["x"], position["y"], position["z"])
         self.owner = owner
 
-    def move(self, target: Hex) -> Hex:
-        N = Hex.distance(self.position, target)
-        if N <= self.sp:
-            self.position = target
-            return target
-        final_hex = Hex.hex_lerp(self.position, target, 1.0 / N * self.sp).hex_round()
-        self.position = final_hex
-        return final_hex
+    def move(self, target: Hex) -> bool:
+        final_hex = Astar.move_to(self.position, target, self.sp)
+        if final_hex != self.position:
+            self.position = final_hex
+            return True
+        return False
 
     @abstractmethod
     def get_firing_range(self):

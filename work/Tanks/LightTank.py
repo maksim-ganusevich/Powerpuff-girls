@@ -1,4 +1,5 @@
 from .Tank import Tank
+from work import Map
 
 
 class LightTank(Tank):
@@ -6,5 +7,5 @@ class LightTank(Tank):
         super(LightTank, self).__init__(id, hp, 3, 1, 1, position, owner)
 
     def get_firing_range(self):
-        return self.position.get_hexes_of_circle(2)
+        return Map.get_hexes_of_circle(self.position, 2)
 
