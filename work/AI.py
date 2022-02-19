@@ -3,23 +3,25 @@ from work.Player import Player
 from work.Hexagon import Hex
 from work.Tanks import *
 import logging
+from typing import List, Dict
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
 class AI:
-    def __init__(self, players: "list[Player]"):
+    def __init__(self, players: List[Player]):
         self.players = players
         random.shuffle(self.players)
-        self.game_name = self.players[0].name + self.players[1].name + self.players[2].name
+        self.game_name = ""
+        for pl in players:
+            self.game_name += pl.name
         self.game_map = None
         self.base = None
         self.game_state = None
 
     def connect(self) -> None:
-        self.players[0].connect(self.game_name, 3)
-        self.players[1].connect(self.game_name)
-        self.players[2].connect(self.game_name)
+        for pl in self.players:
+            pl.connect(self.game_name, 3)
         self.game_map = self.players[0].get_map()
         self.base = self.game_map['content']['base']
 
@@ -34,7 +36,7 @@ class AI:
             return True
         return False
 
-    def shoot(self, player: Player, tank: Tank, enemy_tanks: "list[Tank]") -> bool:
+    def shoot(self, player: Player, tank: Tank, enemy_tanks: List[Tank]) -> bool:
         firing_range = tank.get_firing_range()
         for enemy in enemy_tanks:
             if enemy.position in firing_range and self.check_neutrality(player, enemy):
@@ -42,7 +44,7 @@ class AI:
                 return True
         return False
 
-    def hex_is_free(self, hex: dict) -> bool:
+    def hex_is_free(self, hex: Dict) -> bool:
         for v in self.game_state["vehicles"].values():
             if v["position"] == hex:
                 return False

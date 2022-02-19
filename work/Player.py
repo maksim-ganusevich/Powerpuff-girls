@@ -1,4 +1,5 @@
 from work.ServerHandler import ServerHandler
+from typing import Dict
 
 
 class Player:
@@ -24,7 +25,7 @@ class Player:
     def turn(self, send_r=True, wait_r=True):
         self.server.send_request(6, send_req=send_r, wait_res=wait_r)
 
-    def move(self, move_to: dict):
+    def move(self, move_to: Dict):
         self.server.send_request(101, move_to)
 
     def shoot(self, id: int, shoot_to: dict):
