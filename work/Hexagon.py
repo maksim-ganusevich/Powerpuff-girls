@@ -44,6 +44,10 @@ class Hex:
                    Hex.lerp(a.y, b.y, t),
                    Hex.lerp(a.z, b.z, t))
 
+    def normalize(self):
+        length = self.distance(Hex(0, 0, 0), self)
+        return Hex(self.x // length, self.y // length, self.z // length)
+
     def hex_round(self):
         x = round(self.x)
         y = round(self.y)

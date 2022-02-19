@@ -1,4 +1,5 @@
 from work.ServerHandler import ServerHandler
+from work.Hexagon import Hex
 
 
 class Player:
@@ -24,11 +25,12 @@ class Player:
     def turn(self, send_r=True, wait_r=True):
         self.server.send_request(6, send_req=send_r, wait_res=wait_r)
 
-    def move(self, move_to: dict):
+    def move(self, id: int, move: Hex):
+        move_to = {"vehicle_id": id, "target": move.to_dict()}
         self.server.send_request(101, move_to)
 
-    def shoot(self, id: int, shoot_to: dict):
-        self.server.send_shoot(id, shoot_to.__dict__)
+    def shoot(self, id: int, shoot_to: Hex):
+        self.server.send_shoot(id, shoot_to.to_dict())
 
     def logout(self):
         self.server.send_request(2)

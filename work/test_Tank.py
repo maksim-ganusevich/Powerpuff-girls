@@ -15,8 +15,10 @@ class TestTank(unittest.TestCase):
 
         Map.init_values(11, [], [{"x": 1, "y": -1, "z": 0}, {"x": 1, "y": 0, "z": -1}])
         lt = LightTank(0, 1, {"x": 0, "y": 0, "z": 0}, 0)  # 3 hexes per move
-        lt.move(Hex(2, -1, -1))
-        self.assertEqual(lt.position, Hex(2, -2, 0))
+        lt.move(Hex(4, -2, -2))
+        self.assertEqual(lt.position, Hex(2, 0, -2))
+        lt.move(Hex(4, -2, -2))
+        self.assertEqual(lt.position, Hex(4, -2, -2))
 
     def range_correct(self, center: Hex, r: int, firing_range: []) -> bool:
         for h in firing_range:

@@ -26,6 +26,7 @@ def init_values(_map_size: int, base_list: List, obstacles_list: List) -> None:
 
 def set_vehicles(vehicles_dict: dict) -> None:
     global vehicles
+    vehicles.clear()
     for v in vehicles_dict:
         vehicles.add(Hex(v["position"]["x"], v["position"]["y"], v["position"]["z"]))
 
@@ -42,6 +43,12 @@ def hex_is_free(h: Hex) -> bool:
 
 def in_map_boundaries(hex: Hex) -> bool:
     return max(abs(hex.x), abs(hex.y), abs(hex.z)) <= map_size
+
+
+def get_free_base_hex() -> Hex:
+    for b in base:
+        if hex_is_free(b):
+            return b
 
 
 def get_free_neighbours(center: Hex) -> List[Hex]:
