@@ -1,9 +1,10 @@
 from queue import PriorityQueue
 from work.Hexagon import Hex
 from work import Map
+from typing import List
 
 
-def find_path(start: Hex, goal: Hex):
+def find_path(start: Hex, goal: Hex) -> List[Hex]:
     frontier = PriorityQueue()
     frontier.put((0, start))
     came_from = dict()

@@ -1,3 +1,5 @@
+from typing import Dict
+
 class Hex:
 
     def __init__(self, x, y, z):
@@ -26,7 +28,7 @@ class Hex:
     def __hash__(self):
         return hash(repr(self))
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, int]:
         return {'x': self.x, 'y': self.y, 'z': self.z}
 
     @staticmethod

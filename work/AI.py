@@ -1,5 +1,6 @@
 import random
 import logging
+from typing import List, Dict, Tuple
 from work.Player import Player
 from work.Tanks import *
 from work import Map
@@ -10,24 +11,27 @@ logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt=
 
 
 class AI:
-    def __init__(self, players: "list[Player]"):
+    def __init__(self, players: List[Player]):
         self.players = players
-        random.shuffle(self.players)
-        self.game_name = self.players[0].name + self.players[1].name + self.players[2].name + random.choice("~`,./?!*+-^&@#$%_=")
+
+        self.game_name = ''
+        for pl in self.players:
+            self.game_name += pl.name
+        self.game_name += random.choice("~`,./?!*+-^&@#$%_=")
+
         self.game_state = None
         self.brain = Brain()
 
     def connect(self) -> None:
-        self.players[0].connect(self.game_name, 3)
-        self.players[1].connect(self.game_name)
-        self.players[2].connect(self.game_name)
+        for pl in self.players:
+            pl.connect(self.game_name, 3)
         map_dict = self.players[0].get_map()
         Map.init_values(map_dict['size'], map_dict['content']['base'],
                         map_dict['content']['obstacle'])
         self.brain.init_reasoners()
 
     @staticmethod
-    def construct_tank(tank_id: int, tank_data: dict) -> (Tank, int):
+    def construct_tank(tank_id: int, tank_data: Dict) -> Tuple[Tank, int]:
         # tanks move order: SPG, LT, HТ, MТ, AtSPG
         tank_types = {
             "spg": (SPG, 0),
@@ -40,7 +44,7 @@ class AI:
         return t_type(tank_id, tank_data["health"], tank_data["position"],
                       tank_data["spawn_position"], tank_data["player_id"]), t_move_order
 
-    def get_tank_lists(self, player: Player) -> (([], int), []):
+    def get_tank_lists(self, player: Player) -> Tuple[List[Tuple[int, Tank]], List[Tank]]:
         player_tanks = []
         enemy_tanks = []
         Map.set_vehicles(self.game_state["vehicles"].values())
