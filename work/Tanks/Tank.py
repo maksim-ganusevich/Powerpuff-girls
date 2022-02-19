@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from work.Hexagon import Hex
 from work import Astar
+from typing import List
 
 
 class Tank(ABC):
@@ -21,7 +22,7 @@ class Tank(ABC):
         return False
 
     @abstractmethod
-    def get_firing_range(self):
+    def get_firing_range(self) -> List[Hex]:
         pass
 
     def in_firing_range(self, firing_range: "dict[Hex]") -> bool:

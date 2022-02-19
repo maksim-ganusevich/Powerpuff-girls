@@ -4,21 +4,22 @@ from work.Player import Player
 from work.Hexagon import Hex
 from work.Tanks import *
 from work import Map
+from typing import List, Dict, Tuple
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
 class AI:
-    def __init__(self, players: "list[Player]"):
+    def __init__(self, players: List[Player]):
         self.players = players
-        random.shuffle(self.players)
-        self.game_name = self.players[0].name + self.players[1].name + self.players[2].name
+        self.game_name = ''
+        for pl in self.players:
+            self.game_name += pl.name
         self.game_state = None
 
     def connect(self) -> None:
-        self.players[0].connect(self.game_name, 3)
-        self.players[1].connect(self.game_name)
-        self.players[2].connect(self.game_name)
+        for pl in self.players:
+            pl.connect(self.game_name, 3)
         map_dict = self.players[0].get_map()
         Map.init_values(map_dict['size'], map_dict['content']['base'],
                         map_dict['content']['obstacle'])
@@ -34,7 +35,7 @@ class AI:
             return True
         return False
 
-    def shoot(self, player: Player, tank: Tank, enemy_tanks: "list[Tank]") -> bool:
+    def shoot(self, player: Player, tank: Tank, enemy_tanks: List[Tank]) -> bool:
         firing_range = tank.get_firing_range()
         for enemy in enemy_tanks:
             if enemy.position in firing_range and self.check_neutrality(player, enemy):
@@ -64,7 +65,7 @@ class AI:
         return True
 
     @staticmethod
-    def construct_tank(tank_id: int, tank_data: dict) -> (Tank, int):
+    def construct_tank(tank_id: int, tank_data: Dict) -> Tuple[Tank, int]:
         # tanks move order: SPG, LT, HТ, MТ, AtSPG
         tank_types = {
             "spg": (SPG, 0),
@@ -76,7 +77,7 @@ class AI:
         t_type, t_move_order = tank_types[tank_data["vehicle_type"]]
         return t_type(tank_id, tank_data["health"], tank_data["position"], tank_data["player_id"]), t_move_order
 
-    def get_tank_lists(self, player: Player) -> (([], int), []):
+    def get_tank_lists(self, player: Player) -> Tuple[List[Tuple[int, Tank]], List[Tank]]:
         player_tanks = []
         enemy_tanks = []
         Map.set_vehicles(self.game_state["vehicles"].values())
