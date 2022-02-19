@@ -1,5 +1,4 @@
 class Hex:
-    __map_size = 11
 
     def __init__(self, x, y, z):
         self.x = x
@@ -18,8 +17,17 @@ class Hex:
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __lt__(self, other):
+        return max(abs(self.x), abs(self.y), abs(self.z)) <= max(abs(other.x), abs(other.y), abs(other.z))
+
     def __repr__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
+
+    def __hash__(self):
+        return hash(repr(self))
+
+    def to_dict(self):
+        return {'x': self.x, 'y': self.y, 'z': self.z}
 
     @staticmethod
     def distance(a, b):
@@ -53,45 +61,3 @@ class Hex:
             z = -x - y
 
         return Hex(x, y, z)
-
-    def in_map_boundaries(self):
-        return max(abs(self.x), abs(self.y), abs(self.z)) <= self.__map_size
-
-    # all hexes in the area with self as center
-    def get_hexes_in_range(self, n: int) -> []:
-        results = []
-        for x in range(-n, n + 1):
-            for y in range(max(-n, -x - n), min(n, -x + n) + 1):
-                z = -x - y
-                results.append(self + Hex(x, y, z))
-        return results
-
-    # only hexes on the edge of the area
-    def get_hexes_of_circle(self, r: int) -> []:
-        results = []
-        x = -r
-        for y in range(0, r + 1):
-            z = -x - y
-            results.append(self + Hex(x, y, z))
-            results.append(self + Hex(-x, y - r, z - r))
-        for x in range(-r + 1, r):
-            y = max(-r, -x - r)
-            z = -x - y
-            results.append(self + Hex(x, y, z))
-            y = min(r, -x + r)
-            z = -x - y
-            results.append(self + Hex(x, y, z))
-        return results
-
-    def get_hexes_of_axes(self, d) -> []:
-        directions = [
-            Hex(+1, 0, -1), Hex(+1, -1, 0), Hex(0, -1, +1),
-            Hex(-1, 0, +1), Hex(-1, +1, 0), Hex(0, +1, -1),
-        ]
-        results = []
-        for i in range(1, d + 1):
-            for dir in directions:
-                res = self + dir * i
-                if res.in_map_boundaries():
-                    results.append(res)
-        return results
