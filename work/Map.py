@@ -9,8 +9,6 @@ directions = [
 
 
 def init_values(_map_size: int, base_list: List, obstacles_list: List) -> None:
-    # global base
-    # global obstacles
     global map_size
     map_size = _map_size
     base.clear()
@@ -22,7 +20,7 @@ def init_values(_map_size: int, base_list: List, obstacles_list: List) -> None:
 
 
 def set_vehicles(vehicles_dict: dict) -> None:
-    # global vehicles
+    global vehicles
     vehicles.clear()
     for v in vehicles_dict:
         vehicles.add(Hex(v["position"]["x"], v["position"]["y"], v["position"]["z"]))
@@ -42,6 +40,12 @@ def in_map_boundaries(hex: Hex) -> bool:
     return max(abs(hex.x), abs(hex.y), abs(hex.z)) <= map_size
 
 
+def get_free_base_hex() -> Hex:
+    for b in base:
+        if hex_is_free(b):
+            return b
+
+
 def get_free_neighbours(center: Hex) -> List[Hex]:
     results = []
     for d in directions:
@@ -52,7 +56,7 @@ def get_free_neighbours(center: Hex) -> List[Hex]:
 
 
 # all hexes in the area with self as center
-def get_hexes_in_range(center, n) -> []:
+def get_hexes_in_range(center, n) -> List[Hex]:
     results = []
     for x in range(-n, n + 1):
         for y in range(max(-n, -x - n), min(n, -x + n) + 1):
@@ -63,7 +67,7 @@ def get_hexes_in_range(center, n) -> []:
 
 
 # only hexes on the edge of the area
-def get_hexes_of_circle(center, r) -> []:
+def get_hexes_of_circle(center, r) -> List[Hex]:
     results = []
     x = -r
     for y in range(0, r):
@@ -79,7 +83,7 @@ def get_hexes_of_circle(center, r) -> []:
     return results
 
 
-def get_hexes_of_axes(center, d) -> []:
+def get_hexes_of_axes(center, d) -> List[Hex]:
     results = []
     for dir in directions:
         for i in range(1, d + 1):

@@ -2,7 +2,7 @@ import json
 import socket
 import logging
 from enum import Enum
-
+from typing import Optional, Dict
 logging.basicConfig(level=logging.DEBUG, format='\n%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
@@ -38,7 +38,7 @@ class ServerHandler:
     def __del__(self):
         self.__TCPSocket.close()
 
-    def send_request(self, action, data=None, send_req=True, wait_res=True):
+    def send_request(self, action, data=None, send_req=True, wait_res=True) -> Optional[Dict]:
         # request format: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
@@ -90,6 +90,6 @@ class ServerHandler:
         login = self.send_request(1, data)
         return login["idx"]
 
-    def send_shoot(self, id: int, shoot_pos: dict):
+    def send_shoot(self, id: int, shoot_pos: dict) -> None:
         data = {"vehicle_id": id, "target": shoot_pos}
         self.send_request(102, data)
