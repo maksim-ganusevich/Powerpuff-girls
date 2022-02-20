@@ -1,9 +1,11 @@
 import random
 import logging
+
 from work.Player import Player
 from work.Hexagon import Hex
 from work.Tanks import *
 from work import Map
+from work.config import global_state, base
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
@@ -17,8 +19,8 @@ class AI:
 
     def connect(self) -> None:
         self.players[0].connect(self.game_name, 3)
-        self.players[1].connect(self.game_name)
-        self.players[2].connect(self.game_name)
+        self.players[1].connect(self.game_name, 3)
+        self.players[2].connect(self.game_name, 3)
         map_dict = self.players[0].get_map()
         Map.init_values(map_dict['size'], map_dict['content']['base'],
                         map_dict['content']['obstacle'])
@@ -44,7 +46,7 @@ class AI:
 
     @staticmethod
     def pick_base_hex() -> Hex:
-        for b in Map.base:
+        for b in base:
             if Map.hex_is_free(b):
                 return b
 
@@ -57,6 +59,8 @@ class AI:
         if tank.move(base_pos):
             Map.update_vehicle(prev_pos, tank.position)
             move_to = {"vehicle_id": tank.id, "target": tank.position.to_dict()}
+            self.game_state["vehicles"][str(tank.id)]["position"] = tank.position.to_dict()
+            global_state.update(self.game_state)
             player.move(move_to)
         else:
             logging.warning(msg="Hexes in the way are occupied!")
@@ -112,10 +116,12 @@ class AI:
                 break
 
             for pl in self.players:
+
                 if self.game_state["current_player_idx"] == pl.id:
                     self.make_action(pl)
                     self.send_turn()
                     self.game_state = pl.get_state()
+                    global_state.update(self.game_state)
                     break
 
     def finish_game(self) -> None:
