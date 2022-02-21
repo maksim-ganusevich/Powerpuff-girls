@@ -4,6 +4,7 @@ from typing import List, Dict, Tuple
 from work.Player import Player
 from work.Tanks import *
 from work import Map
+from work.config import global_state, base
 from work.UtilityAI.Brain import Brain
 from work.UtilityAI.Context import Context
 
@@ -80,10 +81,12 @@ class AI:
                 break
 
             for pl in self.players:
+
                 if self.game_state["current_player_idx"] == pl.id:
                     self.make_action(pl)
                     self.send_turn()
                     self.game_state = pl.get_state()
+                    global_state.update(self.game_state)
                     break
 
     def finish_game(self) -> None:

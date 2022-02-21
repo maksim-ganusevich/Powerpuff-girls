@@ -1,6 +1,9 @@
 from enum import Enum
+from threading import Thread
+
 from work.AI import AI
 from work.Player import Player
+from work.Visualisation import Graphics
 
 
 class Action(Enum):
@@ -21,7 +24,12 @@ def main():
     player3 = Player(name="Woody")
     ai = AI([player1, player2, player3])
     ai.connect()
-    ai.start_game()
+
+    graphics = Graphics()
+    th2 = Thread(target=ai.start_game)
+    th2.start()
+    graphics.render()
+
 
 
 if __name__ == "__main__":
