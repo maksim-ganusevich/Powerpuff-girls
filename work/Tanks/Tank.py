@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from work.Hexagon import Hex
-from work import Astar
 from typing import List
+from work import Astar
+from work.Hexagon import Hex
 
 
 class Tank(ABC):
