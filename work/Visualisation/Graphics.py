@@ -4,7 +4,6 @@ from pygame.color import THECOLORS
 from math import fabs, sin, pi, sqrt, cos
 from work.GameState import Info
 
-
 COLORS = [(46, 196, 182), (231, 29, 54), (255, 159, 28)]
 ICONS_PATH = {
     "at_spg": "work\\Visualisation\\icons\\at_spg.png",
@@ -12,6 +11,9 @@ ICONS_PATH = {
     "light_tank": "work\\Visualisation\\icons\\light_tank.png",
     "medium_tank": "work\\Visualisation\\icons\\medium_tank.png",
     "spg": "work\\Visualisation\\icons\\spg.png",
+    "catapult": "work\\Visualisation\\icons\\catapult.png",
+    "hard_repair": "work\\Visualisation\\icons\\hard_repair.png",
+    "light_repair": "work\\Visualisation\\icons\\light_repair.png",
 }
 
 
@@ -27,7 +29,6 @@ class Graphics:
         self.__tank_colors = None
 
         self.__font_size = int(self.__hex_radius * 2)
-
 
     def get_colors(self):
         color_dict = dict()
@@ -103,17 +104,50 @@ class Graphics:
 
     def __draw_base(self):
         for base_hex in self.info.base:
-            position = self.__hex_cords[(base_hex["x"], base_hex["y"], base_hex["z"])]
+            position = self.__hex_cords[tuple(base_hex.values())]
             self.__draw_hex((154, 205, 50), 0, self.__hex_radius, position)
             self.__draw_hex(THECOLORS['black'], 3, self.__hex_radius, position)
 
-    def draw_tanks(self):
+    def __draw_catapult(self):
+        for catapult in self.info.catapult:
+            pos_key = tuple(catapult.values())
+            position = self.__hex_cords[pos_key]
+            catapult_surf = pygame.image.load(ICONS_PATH["catapult"])
+            scale = pygame.transform.smoothscale(
+                catapult_surf, (1.4 * self.__hex_radius,
+                                1.4 * self.__hex_radius))
+            catapult_rect = scale.get_rect(center=position)
+            self.__screen.blit(scale, catapult_rect)
+
+    def __draw_hard_repair(self):
+        for hard_repair in self.info.hard_repair:
+            pos_key = tuple(hard_repair.values())
+            position = self.__hex_cords[pos_key]
+            hard_repair_surf = pygame.image.load(ICONS_PATH["hard_repair"])
+            scale = pygame.transform.smoothscale(
+                hard_repair_surf, (1.4 * self.__hex_radius,
+                                   1.4 * self.__hex_radius))
+            hard_repair_rect = scale.get_rect(center=position)
+            self.__screen.blit(scale, hard_repair_rect)
+
+    def __draw_light_repair(self):
+        for light_repair in self.info.light_repair:
+            pos_key = tuple(light_repair.values())
+            position = self.__hex_cords[pos_key]
+            light_repair_surf = pygame.image.load(ICONS_PATH["light_repair"])
+            scale = pygame.transform.smoothscale(
+                light_repair_surf, (1.4 * self.__hex_radius,
+                                    1.4 * self.__hex_radius))
+            light_repair_rect = scale.get_rect(center=position)
+            self.__screen.blit(scale, light_repair_rect)
+
+    def __draw_tanks(self):
         font_hp = pygame.font.SysFont("calibri", int(self.__hex_radius), True)
         for tank in self.info.vehicles.values():
             owner_id = tank["player_id"]
             tank_type = tank["vehicle_type"]
             hp = tank["health"]
-            pos_key = (tank["position"]["x"], tank["position"]["y"], tank["position"]["z"])
+            pos_key = (tuple(tank["position"].values()))
             position = self.__hex_cords[pos_key]
             color = self.__tank_colors[owner_id]
             self.__draw_hex(color, 0, self.__hex_radius, position)
@@ -159,7 +193,7 @@ class Graphics:
             position = self.__screen_width * 1.9 / 3, position[1] + self.__hex_radius * 1.2
             self.__screen.blit(text, position)
 
-    def draw_info(self):
+    def __draw_info(self):
         self.__draw_turns()
         self.__draw_players()
         self.__draw_win_points()
@@ -168,7 +202,8 @@ class Graphics:
         if self.info.finished:
             winner_id = self.info.winner
             rect = pygame.Rect(
-                (self.__screen_width * 0.2, self.__screen_height * 0.3, self.__screen_width * 0.6, self.__screen_height * 0.4))
+                (self.__screen_width * 0.2, self.__screen_height * 0.3, self.__screen_width * 0.6,
+                 self.__screen_height * 0.4))
             pygame.draw.rect(self.__screen, (119, 148, 166), rect, 0)
             pygame.draw.rect(self.__screen, THECOLORS['black'], rect, 5)
             font = pygame.font.SysFont("calibri", self.__font_size * 2, True)
@@ -182,11 +217,14 @@ class Graphics:
         self.__draw_empty_map()
         self.__draw_base()
         self.__draw_obstacles()
+        self.__draw_catapult()
+        self.__draw_hard_repair()
+        self.__draw_light_repair()
         if self.info.current_player_idx:
             if not self.__tank_colors:
                 self.__tank_colors = self.get_colors()
-            self.draw_tanks()
-            self.draw_info()
+            self.__draw_tanks()
+            self.__draw_info()
             self.__draw_winner()
 
     def render(self):

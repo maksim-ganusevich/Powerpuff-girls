@@ -24,4 +24,3 @@ class ActionCaptureBase(Action):
                 # update info for visualisation
                 self.info.vehicles[str(curr_tank.id)]["position"] = curr_tank.position.convert_to_dict()
                 context.player.move(curr_tank.id, curr_tank.position)
-                print('update tank')

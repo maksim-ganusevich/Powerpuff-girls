@@ -1,7 +1,6 @@
 from typing import List
 from work.Hexagon import Hex
 
-
 directions = [
     Hex(+1, 0, -1), Hex(+1, -1, 0), Hex(0, -1, +1),
     Hex(-1, 0, +1), Hex(-1, +1, 0), Hex(0, +1, -1),
@@ -10,6 +9,7 @@ map_size = 0
 base = set()
 obstacles = set()
 vehicles = set()
+
 
 def init_values(_map_size: int, base_list: List, obstacles_list: List) -> None:
     global map_size
