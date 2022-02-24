@@ -3,6 +3,7 @@ import sys
 from pygame.color import THECOLORS
 from math import fabs, sin, pi, sqrt, cos
 from work.GameState import Info
+from work.Singleton import Singleton
 
 COLORS = [(46, 196, 182), (231, 29, 54), (255, 159, 28)]
 ICONS_PATH = {
@@ -17,7 +18,7 @@ ICONS_PATH = {
 }
 
 
-class Graphics:
+class Graphics(metaclass=Singleton):
 
     def __init__(self):
         self.info = Info()
@@ -27,7 +28,6 @@ class Graphics:
         self.__screen = pygame.display.set_mode((self.__screen_width, self.__screen_height))
         self.__hex_cords = self.__get_hexes_coord()
         self.__tank_colors = None
-
         self.__font_size = int(self.__hex_radius * 2)
 
     def get_colors(self):
@@ -143,23 +143,35 @@ class Graphics:
 
     def __draw_tanks(self):
         font_hp = pygame.font.SysFont("calibri", int(self.__hex_radius), True)
-        for tank in self.info.vehicles.values():
-            owner_id = tank["player_id"]
-            tank_type = tank["vehicle_type"]
-            hp = tank["health"]
-            pos_key = (tuple(tank["position"].values()))
-            position = self.__hex_cords[pos_key]
-            color = self.__tank_colors[owner_id]
-            self.__draw_hex(color, 0, self.__hex_radius, position)
-            self.__draw_hex(THECOLORS['black'], 3, self.__hex_radius, position)
-            tank_surf = pygame.image.load(ICONS_PATH[tank_type])
-            scale = pygame.transform.smoothscale(
-                tank_surf, (1.5 * self.__hex_radius,
-                            1.5 * self.__hex_radius))
-            tank_rect = scale.get_rect(center=position)
-            self.__screen.blit(scale, tank_rect)
-            hp_str = font_hp.render(str(hp), True, (127, 255, 0))
-            self.__screen.blit(hp_str, (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7))
+        if self.info.current_player_idx:
+            for tank in self.info.vehicles.values():
+                owner_id = tank["player_id"]
+                tank_type = tank["vehicle_type"]
+                hp = tank["health"]
+                pos_key = (tuple(tank["position"].values()))
+                position = self.__hex_cords[pos_key]
+                color = self.__tank_colors[owner_id]
+                self.__draw_hex(color, 0, self.__hex_radius, position)
+                self.__draw_hex(THECOLORS['black'], 3, self.__hex_radius, position)
+                tank_surf = pygame.image.load(ICONS_PATH[tank_type])
+                scale = pygame.transform.smoothscale(
+                    tank_surf, (1.5 * self.__hex_radius,
+                                1.5 * self.__hex_radius))
+                tank_rect = scale.get_rect(center=position)
+                self.__screen.blit(scale, tank_rect)
+                hp_str = font_hp.render(str(hp), True, (127, 255, 0))
+                self.__screen.blit(hp_str, (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7))
+        else:
+            for team_tanks in self.info.spawn_points:
+                for t_type, tank in team_tanks.items():
+                    pos_key = (tuple(tank[0].values()))
+                    position = self.__hex_cords[pos_key]
+                    tank_surf = pygame.image.load(ICONS_PATH[t_type])
+                    scale = pygame.transform.smoothscale(
+                        tank_surf, (1.5 * self.__hex_radius,
+                                    1.5 * self.__hex_radius))
+                    tank_rect = scale.get_rect(center=position)
+                    self.__screen.blit(scale, tank_rect)
 
     def __draw_turns(self):
         font = pygame.font.SysFont("calibri", int(self.__font_size * 1.5), False)
@@ -220,12 +232,14 @@ class Graphics:
         self.__draw_catapult()
         self.__draw_hard_repair()
         self.__draw_light_repair()
+        if self.info.current_player_idx and not self.__tank_colors:
+            self.__tank_colors = self.get_colors()
+        self.__draw_tanks()
         if self.info.current_player_idx:
-            if not self.__tank_colors:
-                self.__tank_colors = self.get_colors()
-            self.__draw_tanks()
             self.__draw_info()
             self.__draw_winner()
+
+
 
     def render(self):
         pygame.init()
