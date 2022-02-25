@@ -1,11 +1,14 @@
 from typing import List
 from work.Hexagon import Hex
-from work.config import base, obstacles, vehicles, map_size
 
 directions = [
     Hex(+1, 0, -1), Hex(+1, -1, 0), Hex(0, -1, +1),
     Hex(-1, 0, +1), Hex(-1, +1, 0), Hex(0, +1, -1),
 ]
+map_size = 0
+base = set()
+obstacles = set()
+vehicles = set()
 
 
 def init_values(_map_size: int, base_list: List, obstacles_list: List) -> None:
@@ -20,14 +23,12 @@ def init_values(_map_size: int, base_list: List, obstacles_list: List) -> None:
 
 
 def set_vehicles(vehicles_dict: dict) -> None:
-    global vehicles
     vehicles.clear()
     for v in vehicles_dict:
         vehicles.add(Hex(v["position"]["x"], v["position"]["y"], v["position"]["z"]))
 
 
 def update_vehicle(old_pos: Hex, new_pos: Hex) -> None:
-    # global vehicles
     vehicles.remove(old_pos)
     vehicles.add(new_pos)
 

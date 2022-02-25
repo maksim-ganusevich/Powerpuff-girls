@@ -25,9 +25,9 @@ def main():
     ai = AI([player1, player2, player3])
     ai.connect()
 
+    th = Thread(target=ai.start_game)
+    th.start()
     graphics = Graphics()
-    th2 = Thread(target=ai.start_game)
-    th2.start()
     graphics.render()
 
 

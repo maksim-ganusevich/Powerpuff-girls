@@ -1,26 +1,24 @@
 import random
 import logging
 from typing import List, Dict, Tuple
+from work.Singleton import Singleton
 from work.Player import Player
 from work.Tanks import *
 from work import Map
-from work.config import global_state, base
 from work.UtilityAI.Brain import Brain
 from work.UtilityAI.Context import Context
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
-class AI:
+class AI(metaclass=Singleton):
     def __init__(self, players: List[Player]):
         self.players = players
-
         self.game_name = ''
         for pl in self.players:
             self.game_name += pl.name
         self.game_name += random.choice("~`,./?!*+-^&@#$%_=")
-
-        self.game_state = None
+        self.game_state = dict()
         self.brain = Brain()
 
     def connect(self) -> None:
@@ -86,7 +84,6 @@ class AI:
                     self.make_action(pl)
                     self.send_turn()
                     self.game_state = pl.get_state()
-                    global_state.update(self.game_state)
                     break
 
     def finish_game(self) -> None:
