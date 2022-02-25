@@ -160,7 +160,8 @@ class Graphics(metaclass=Singleton):
                 tank_rect = scale.get_rect(center=position)
                 self.__screen.blit(scale, tank_rect)
                 hp_str = font_hp.render(str(hp), True, (127, 255, 0))
-                self.__screen.blit(hp_str, (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7))
+                self.__screen.blit(hp_str,
+                                   (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7))
         else:
             for team_tanks in self.info.spawn_points:
                 for t_type, tank in team_tanks.items():
@@ -238,8 +239,6 @@ class Graphics(metaclass=Singleton):
         if self.info.current_player_idx:
             self.__draw_info()
             self.__draw_winner()
-
-
 
     def render(self):
         pygame.init()
