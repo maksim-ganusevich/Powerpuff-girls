@@ -3,6 +3,7 @@ from work.ServerHandler import ServerHandler
 from work.Hexagon import Hex
 from work.GameState import Info
 
+
 class Player:
     def __init__(self, name: str):
         self.name = name
@@ -11,7 +12,6 @@ class Player:
         self.tanks = []
         self.id = None
         self.info = Info()
-
 
     def connect(self, game: str, num_players=1) -> None:
         self.id = self.server.send_login(name=self.name, game=game, num_players=num_players)
