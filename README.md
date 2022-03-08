@@ -19,13 +19,17 @@ Our intelligence takes into account the position, life points, capture points an
 First you have to download this repository.
 Now go to the root folder of the project and run the following command:
 <br>
-$ pip install -r requirements.txt
+```
+pip install -r requirements.txt
+```
 ***
 ***how to launch***
 <br>
 Run the command in the root folder of the project:
 <br>
-$python main.py
+```
+python main.py
+```
 ***
 ***Our team:***
 <br>
