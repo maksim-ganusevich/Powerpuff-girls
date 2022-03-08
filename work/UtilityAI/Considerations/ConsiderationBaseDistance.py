@@ -1,5 +1,5 @@
-from .Consideration import Consideration
-from work.UtilityAI.Context import Context
+from . import Consideration
+from work.UtilityAI import Context
 from work import Map
 from work.Hexagon import Hex
 

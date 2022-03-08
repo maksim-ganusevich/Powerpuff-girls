@@ -1,7 +1,7 @@
 from typing import List
-from .Reasoner import Reasoner
-from work.UtilityAI.Actions.Action import Action
-from work.UtilityAI.Context import Context
+from . import Reasoner
+from work.UtilityAI.Actions import Action
+from work.UtilityAI import Context
 
 
 # helper reasoner to retrieve a best target

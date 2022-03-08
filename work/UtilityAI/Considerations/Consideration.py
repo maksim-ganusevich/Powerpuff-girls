@@ -1,6 +1,6 @@
 from typing import Callable
 from abc import ABC, abstractmethod
-from work.UtilityAI.Context import Context
+from work.UtilityAI import Context
 from work.UtilityAI.Curve import Curve, CurveRules
 
 

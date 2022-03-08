@@ -3,7 +3,9 @@ import socket
 import logging
 from enum import Enum
 from typing import Optional, Dict
-logging.basicConfig(level=logging.DEBUG, format='\n%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
+logging.basicConfig(level=logging.DEBUG,
+                    format='\n%(levelname)s - %(asctime)s - %(message)s',
+                    datefmt='%H:%M:%S')
 
 
 class Result(Enum):
@@ -47,7 +49,8 @@ class ServerHandler:
             if data:
                 json_value = json.dumps(data, separators=(',', ':'))
                 data_length = len(json_value)
-                bytes_to_send += data_length.to_bytes(4, byteorder='little') + bytes(json_value.encode('utf-8'))
+                bytes_to_send += data_length.to_bytes(4, byteorder='little')\
+                                 + bytes(json_value.encode('utf-8'))
             else:
                 bytes_to_send += data_length.to_bytes(4, byteorder='little')
             self.__TCPSocket.sendall(bytes_to_send)
@@ -83,9 +86,11 @@ class ServerHandler:
                 return data
 
     # returns id of the current player
-    def send_login(self, name: str, password="", game: str = None, num_turns: int = None, num_players=1,
+    def send_login(self, name: str, password="", game: str = None,
+                   num_turns: int = None, num_players=1,
                    is_observer=False) -> int:
-        data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
+        data = {"name": name, "password": password, "game": game,
+                "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}
         login = self.send_request(1, data)
         return login["idx"]

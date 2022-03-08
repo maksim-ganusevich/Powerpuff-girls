@@ -1,9 +1,9 @@
 from typing import List
-from ..Considerations.Consideration import Consideration
-from work.UtilityAI.Context import Context
-from .Action import Action
 from work import Map
 from work.GameState import Info
+from work.UtilityAI import Context
+from .Action import Action
+from ..Considerations import Consideration
 
 
 class ActionCaptureBase(Action):

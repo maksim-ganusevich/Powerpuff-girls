@@ -18,13 +18,13 @@ def find_path(start: Hex, goal: Hex) -> List[Hex]:
         if current == goal:
             break
 
-        for next in Map.get_free_neighbours(current):
+        for next_hex in Map.get_free_neighbours(current):
             new_cost = cost_so_far[current]  # + hex cost
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                priority = new_cost + Hex.distance(goal, next)
-                frontier.put((priority, next))
-                came_from[next] = current
+            if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
+                cost_so_far[next_hex] = new_cost
+                priority = new_cost + Hex.distance(goal, next_hex)
+                frontier.put((priority, next_hex))
+                came_from[next_hex] = current
 
     # construct path by following backwards
     current = goal

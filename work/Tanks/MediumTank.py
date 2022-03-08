@@ -1,7 +1,7 @@
 from typing import List
-from .Tank import Tank
 from work.Hexagon import Hex
 from work import Map
+from . import Tank
 
 
 class MediumTank(Tank):
