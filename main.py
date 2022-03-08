@@ -31,6 +31,5 @@ def main():
     graphics.render()
 
 
-
 if __name__ == "__main__":
     main()

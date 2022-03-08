@@ -1,6 +1,6 @@
 from queue import PriorityQueue
 from work.Hexagon import Hex
-from work import Map
+from work.Map import Map
 from typing import List
 
 
@@ -18,7 +18,7 @@ def find_path(start: Hex, goal: Hex) -> List[Hex]:
         if current == goal:
             break
 
-        for next in Map.get_free_neighbours(current):
+        for next in Map().get_free_neighbours(current):
             new_cost = cost_so_far[current]  # + hex cost
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
@@ -37,13 +37,13 @@ def find_path(start: Hex, goal: Hex) -> List[Hex]:
 
 
 def move_to(start: Hex, goal: Hex, speed_points: int) -> Hex:
-    if not Map.in_map_boundaries(goal):
+    if not Map().in_map_boundaries(goal):
         return start
     path = find_path(start, goal)
     if len(path) <= speed_points:
         return goal
     for i in range(speed_points, 0, -1):
         final_hex = path[len(path) - i]  # intermediate hex on the path
-        if final_hex not in Map.vehicles:  # check if occupied by other vehicle
+        if final_hex not in Map().vehicles:  # check if occupied by other vehicle
             return final_hex
     return start
