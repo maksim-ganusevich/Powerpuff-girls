@@ -86,9 +86,9 @@ def get_hexes_of_circle(center, r) -> List[Hex]:
 
 def get_hexes_of_axes(center, d) -> List[Hex]:
     results = []
-    for dir in directions:
+    for direction in directions:
         for i in range(1, d + 1):
-            res = center + dir * i
+            res = center + direction * i
             if res in obstacles:
                 break  # stop looking in direction of obstacle
             if in_map_boundaries(res):

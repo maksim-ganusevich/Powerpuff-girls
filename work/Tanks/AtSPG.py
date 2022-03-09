@@ -1,12 +1,12 @@
 from typing import List
-from .Tank import Tank
 from work import Map
 from work.Hexagon import Hex
+from . import Tank
 
 
 class AtSPG(Tank):
-    def __init__(self, id, hp, position, spawn_pos, owner):
-        super(AtSPG, self).__init__(id, hp, 1, 1, 2, position, spawn_pos, owner)
+    def __init__(self, idx, hp, position, spawn_pos, owner):
+        super(AtSPG, self).__init__(idx, hp, 1, 1, 2, position, spawn_pos, owner)
 
     def get_shoot_pos(self, target: Hex) -> Hex:
         # for AtSPG: Target hex for direction indication must be adjacent to the vehicle

@@ -1,9 +1,10 @@
-from work.UtilityAI.Actions import *
-from work.UtilityAI.Reasoners import *
-from work.UtilityAI.Considerations import *
-from .Context import Context
-from .Curve import Curve, CurveRules
 from work import Map
+from work.UtilityAI.Actions import ActionShoot, ActionTarget, ActionCaptureBase
+from work.UtilityAI.Reasoners import ReasonerGetTarget, Reasoner
+from .Considerations import ConsiderationTargetInRange, ConsiderationNeutralityRule, \
+    ConsiderationTargetDistance, ConsiderationTargetHealth, ConsiderationBaseDistance
+from . import Context
+from .Curve import Curve, CurveRules
 
 
 # Combining reasoners, actions and considerations
@@ -18,7 +19,7 @@ class Brain:
         act_target = ActionTarget([ConsiderationTargetHealth(Curve.linear_quadratic,
                                                              CurveRules(m=4, k=2, inverse=True)),
                                    ConsiderationTargetDistance(Curve.linear_quadratic,
-                                                               CurveRules(m=Map.map_size*2, k=0.2, inverse=True)),
+                                                               CurveRules(m=Map.map_size * 2, k=0.2, inverse=True)),
                                    ConsiderationNeutralityRule()])
         self.reasoner_target = ReasonerGetTarget([act_target])
 
@@ -28,7 +29,8 @@ class Brain:
                                  ConsiderationTargetInRange(),
                                  ConsiderationNeutralityRule()])
         act_capture_base = ActionCaptureBase([ConsiderationBaseDistance(Curve.linear_quadratic,
-                                                                        CurveRules(m=Map.map_size+1, k=0.5, inverse=True))])
+                                                                        CurveRules(m=Map.map_size + 1, k=0.5,
+                                                                                   inverse=True))])
         self.reasoner = Reasoner([act_shoot, act_capture_base])
 
     # picking the best action and executing it

@@ -1,6 +1,6 @@
 import unittest
 from work.Hexagon import Hex
-from work.Tanks import *
+from work.Tanks import AtSPG, HeavyTank, LightTank, MediumTank, SPG
 from work import Map
 
 
@@ -20,22 +20,25 @@ class TestTank(unittest.TestCase):
         lt.move(Hex(4, -2, -2))
         self.assertEqual(lt.position, Hex(4, -2, -2))
 
-    def range_correct(self, center: Hex, r: int, firing_range: []) -> bool:
+    @staticmethod
+    def range_correct(center: Hex, r: int, firing_range: []) -> bool:
         for h in firing_range:
             if Hex.distance(center, h) > r or not h.in_map_boundaries():
                 return False
         return True
 
-    def circle_range_correct(self, center: Hex, r: int, firing_range: []) -> bool:
+    @staticmethod
+    def circle_range_correct(center: Hex, r: int, firing_range: []) -> bool:
         for h in firing_range:
             if Hex.distance(center, h) != r or not h.in_map_boundaries():
                 return False
         return True
 
-    def axes_range_correct(self, center: Hex, r: int, firing_range: []) -> bool:
+    @staticmethod
+    def axes_range_correct(center: Hex, r: int, firing_range: []) -> bool:
         for h in firing_range:
             axes = h - center
-            if Hex.distance(center, h) > r or not h.in_map_boundaries()\
+            if Hex.distance(center, h) > r or not h.in_map_boundaries() \
                     or (axes.x != 0 and axes.y != 0 and axes.z != 0):
                 return False
         return True

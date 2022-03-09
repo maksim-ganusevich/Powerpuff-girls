@@ -1,6 +1,6 @@
 from typing import List
-from work.UtilityAI.Considerations.Consideration import Consideration
-from .Action import Action
+from . import Action
+from ..Considerations import Consideration
 
 
 # acts as a container for target considerations

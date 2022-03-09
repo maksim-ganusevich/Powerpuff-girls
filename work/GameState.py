@@ -1,4 +1,4 @@
-from work.Singleton import Singleton
+from work import Singleton
 
 
 class Info(metaclass=Singleton):

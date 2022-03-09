@@ -1,5 +1,5 @@
+from sys import exit
 import pygame
-import sys
 from pygame.color import THECOLORS
 from math import fabs, sin, pi, sqrt, cos
 from work.GameState import Info
@@ -90,7 +90,6 @@ class Graphics(metaclass=Singleton):
                          (self.__screen_width * 0.57, 0),
                          (self.__screen_width * 0.57, self.__screen_height),
                          int(self.__hex_radius))
-
         for value in self.__hex_cords.values():
             hex_r = self.__screen_height / self.info.size / 3.5
             self.__draw_hex((242, 218, 145), 0, hex_r, value)
@@ -147,7 +146,6 @@ class Graphics(metaclass=Singleton):
             for tank in self.info.vehicles.values():
                 owner_id = tank["player_id"]
                 tank_type = tank["vehicle_type"]
-                hp = tank["health"]
                 pos_key = (tuple(tank["position"].values()))
                 position = self.__hex_cords[pos_key]
                 color = self.__tank_colors[owner_id]
@@ -159,9 +157,9 @@ class Graphics(metaclass=Singleton):
                                 1.5 * self.__hex_radius))
                 tank_rect = scale.get_rect(center=position)
                 self.__screen.blit(scale, tank_rect)
-                hp_str = font_hp.render(str(hp), True, (127, 255, 0))
-                self.__screen.blit(hp_str,
-                                   (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7))
+                hp_str = font_hp.render(str(tank["health"]), True, (127, 255, 0))
+                pos = (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7)
+                self.__screen.blit(hp_str, pos)
         else:
             for team_tanks in self.info.spawn_points:
                 for t_type, tank in team_tanks.items():
@@ -178,8 +176,8 @@ class Graphics(metaclass=Singleton):
         font = pygame.font.SysFont("calibri", int(self.__font_size * 1.5), False)
         turns_message = "TURN: %s/%s" % (self.info.current_turn, self.info.num_turns)
         text = font.render(turns_message, True, (242, 153, 75))
-        position = self.__screen_width * 205 / 300, self.__screen_height / 2 - self.__hex_radius * 1.5
-        self.__screen.blit(text, position)
+        pos = self.__screen_width * 205 / 300, self.__screen_height / 2 - self.__hex_radius * 1.5
+        self.__screen.blit(text, pos)
 
     def __draw_players(self):
         font_b = pygame.font.SysFont("calibri", self.__font_size, False)
@@ -200,9 +198,9 @@ class Graphics(metaclass=Singleton):
         position = self.__screen_width * 2 / 3, self.__screen_height * 3 / 4
         self.__screen.blit(text, position)
         position = self.__screen_width * 1.9 / 3, self.__screen_height * 3 / 4 + self.__hex_radius
-        for id, values in self.info.win_points.items():
-            player_message = "ID: %s   capture: %s   kill: %s" % (id, values["capture"], values["kill"])
-            text = font_l.render(player_message, True, self.__tank_colors[int(id)])
+        for xid, values in self.info.win_points.items():
+            player_message = "ID: %s   capture: %s   kill: %s" % (xid, values["capture"], values["kill"])
+            text = font_l.render(player_message, True, self.__tank_colors[int(xid)])
             position = self.__screen_width * 1.9 / 3, position[1] + self.__hex_radius * 1.2
             self.__screen.blit(text, position)
 
@@ -249,6 +247,6 @@ class Graphics(metaclass=Singleton):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    sys.exit()
+                    exit()
             self.__draw_all()
             pygame.display.update()

@@ -1,7 +1,7 @@
 from typing import List
-from ..Considerations.Consideration import Consideration
-from work.UtilityAI.Context import Context
-from .Action import Action
+from . import Action
+from ..Considerations import Consideration
+from work.UtilityAI import Context
 
 
 class ActionShoot(Action):

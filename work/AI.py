@@ -1,12 +1,12 @@
 import random
 import logging
 from typing import List, Dict, Tuple
-from work.Singleton import Singleton
-from work.Player import Player
-from work.Tanks import *
+from work import Singleton
+from work import Player
 from work import Map
-from work.UtilityAI.Brain import Brain
-from work.UtilityAI.Context import Context
+from work.Tanks import AtSPG, HeavyTank, LightTank, MediumTank, SPG, Tank
+from work.UtilityAI import Brain
+from work.UtilityAI import Context
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
@@ -15,15 +15,15 @@ class AI(metaclass=Singleton):
     def __init__(self, players: List[Player]):
         self.players = players
         self.game_name = ''
-        for pl in self.players:
-            self.game_name += pl.name
+        for player in self.players:
+            self.game_name += player.name
         self.game_name += random.choice("~`,./?!*+-^&@#$%_=")
         self.game_state = dict()
         self.brain = Brain()
 
     def connect(self) -> None:
-        for pl in self.players:
-            pl.connect(self.game_name, 3)
+        for player in self.players:
+            player.connect(self.game_name, 3)
         map_dict = self.players[0].get_map()
         Map.init_values(map_dict['size'], map_dict['content']['base'],
                         map_dict['content']['obstacle'])
@@ -59,8 +59,9 @@ class AI(metaclass=Singleton):
     def make_action(self, player: Player) -> None:
         player_tanks, enemy_tanks = self.get_tank_lists(player)
         player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
-        context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks, self.game_state["attack_matrix"])
-        for i, (tank_move_order, tank) in enumerate(player.tanks):
+        context = Context(player, 0, [t[1] for t in player.tanks],
+                          enemy_tanks, self.game_state["attack_matrix"])
+        for i in range(len(player.tanks)):
             context.update_curr_tank_index(i)
             self.brain.act(context)
 
@@ -78,14 +79,14 @@ class AI(metaclass=Singleton):
                 self.finish_game()
                 break
 
-            for pl in self.players:
+            for player in self.players:
 
-                if self.game_state["current_player_idx"] == pl.id:
-                    self.make_action(pl)
+                if self.game_state["current_player_idx"] == player.id:
+                    self.make_action(player)
                     self.send_turn()
-                    self.game_state = pl.get_state()
+                    self.game_state = player.get_state()
                     break
 
     def finish_game(self) -> None:
-        for pl in self.players:
-            pl.logout()
+        for player in self.players:
+            player.logout()
