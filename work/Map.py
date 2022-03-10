@@ -88,9 +88,9 @@ class Map(metaclass=Singleton):
 
     def get_hexes_of_axes(self, center, d) -> List[Hex]:
         results = []
-        for dir in DIRECTIONS:
+        for direction in DIRECTIONS:
             for i in range(1, d + 1):
-                res = center + dir * i
+                res = center + direction * i
                 if res in self.obstacles:
                     break  # stop looking in direction of obstacle
                 if self.in_map_boundaries(res):

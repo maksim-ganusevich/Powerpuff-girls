@@ -4,8 +4,7 @@ from work.UtilityAI import Context
 
 class ConsiderationNeutralityRule(Consideration):
 
-    @staticmethod
-    def score(context: Context) -> float:
+    def score(self, context: Context) -> float:
         id_all_players = list(context.attack_matrix.keys())
         id_all_players.remove(str(context.player.id))
         id_all_players.remove(str(context.get_target().owner))

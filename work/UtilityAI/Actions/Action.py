@@ -5,7 +5,6 @@ from work.UtilityAI.Context import Context
 
 
 class Action(ABC):
-
     def __init__(self, considerations: List[Consideration]):
         # list of considerations define how likely the action will be picked
         self.considerations = considerations

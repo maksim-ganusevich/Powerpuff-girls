@@ -6,7 +6,6 @@ from work.Map import Map
 from work.ServerCommands import Action
 
 
-
 class Player:
     def __init__(self, name: str):
         self.name = name

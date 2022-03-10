@@ -3,7 +3,7 @@ import logging
 from typing import List, Dict, Tuple
 from work import Singleton
 from work import Player
-from work import Map
+from work.GameState import GameState
 from work.Tanks import *
 from work.UtilityAI import Brain
 from work.UtilityAI import Context

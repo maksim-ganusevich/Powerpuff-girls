@@ -18,7 +18,7 @@ def find_path(start: Hex, goal: Hex) -> List[Hex]:
         if current == goal:
             break
 
-        for next in Map().get_free_neighbours(current):
+        for next_hex in Map().get_free_neighbours(current):
             new_cost = cost_so_far[current]  # + hex cost
             if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
                 cost_so_far[next_hex] = new_cost

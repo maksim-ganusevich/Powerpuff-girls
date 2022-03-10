@@ -30,7 +30,8 @@ class Graphics(metaclass=Singleton):
         self.__tank_colors = None
         self.__font_size = int(self.__hex_radius * 2)
 
-    def get_colors(self):
+    @staticmethod
+    def get_colors():
         color_dict = dict()
         for color_id, player in enumerate(GameState().players):
             color_dict[player["idx"]] = COLORS[color_id]
@@ -78,7 +79,8 @@ class Graphics(metaclass=Singleton):
         ]
         pygame.draw.polygon(self.__screen, color, points, width)
 
-    def __get_name(self, player_id: int) -> str:
+    @staticmethod
+    def __get_name(player_id: int) -> str:
         for pl in GameState().players:
             if player_id == pl["idx"]:
                 return pl["name"]
