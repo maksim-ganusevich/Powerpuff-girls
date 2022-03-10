@@ -1,6 +1,6 @@
 from typing import List
 from work.Tanks import Tank
-from work.Player import Player
+from work import Player
 
 
 class Context:

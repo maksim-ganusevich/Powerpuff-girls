@@ -5,6 +5,10 @@ from typing import Optional, Dict
 from work.ServerCommands import Action, Result
 from work.ServerConfig import ADDRESS, PORT, ACTION_LENGTH, RESULT_LENGTH, DATA_LENGTH
 
+logging.basicConfig(level=logging.DEBUG,
+                    format='\n%(levelname)s - %(asctime)s - %(message)s',
+                    datefmt='%H:%M:%S')
+
 logging.basicConfig(level=logging.DEBUG, format='\n%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
@@ -66,9 +70,11 @@ class ServerHandler:
                 return data
 
     # returns id of the current player
-    def send_login(self, name: str, password="", game: str = None, num_turns: int = None, num_players=1,
+    def send_login(self, name: str, password="", game: str = None,
+                   num_turns: int = None, num_players=1,
                    is_observer=False) -> int:
-        data = {"name": name, "password": password, "game": game, "num_turns": num_turns, "num_players": num_players,
+        data = {"name": name, "password": password, "game": game,
+                "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}
         login = self.send_request(Action.LOGIN, data)
         return login["idx"]

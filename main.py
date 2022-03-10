@@ -8,11 +8,11 @@ def main():
     player1 = Player(name="Carlos")
     player2 = Player(name="Semen")
     player3 = Player(name="Woody")
-    ai = AI([player1, player2, player3])
-    ai.connect()
+    ai_ = AI([player1, player2, player3])
+    ai_.connect()
 
-    th = Thread(target=ai.start_game)
-    th.start()
+    th_ = Thread(target=ai_.start_game)
+    th_.start()
     graphics = Graphics()
     graphics.render()
 

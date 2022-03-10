@@ -23,10 +23,12 @@ class Tank(ABC):
             return True
         return False
 
-    def shoot(self, target) -> None:
+    @staticmethod
+    def shoot(target) -> None:
         target.take_damage()
 
-    def get_shoot_pos(self, target: Hex):
+    @staticmethod
+    def get_shoot_pos(target: Hex):
         return target
 
     def take_damage(self) -> None:

@@ -1,12 +1,12 @@
 import random
 import logging
 from typing import List, Dict, Tuple
-from work.Singleton import Singleton
-from work.Player import Player
+from work import Singleton
+from work import Player
+from work import Map
 from work.Tanks import *
-from work.GameState import GameState
-from work.UtilityAI.Brain import Brain
-from work.UtilityAI.Context import Context
+from work.UtilityAI import Brain
+from work.UtilityAI import Context
 
 logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
@@ -15,8 +15,8 @@ class AI(metaclass=Singleton):
     def __init__(self, players: List[Player]):
         self.players = players
         self.game_name = ''
-        for pl in self.players:
-            self.game_name += pl.name
+        for player in self.players:
+            self.game_name += player.name
         self.game_name += random.choice("~`,./?!*+-^&@#$%_=")
         self.brain = Brain()
 
@@ -56,7 +56,7 @@ class AI(metaclass=Singleton):
         player_tanks, enemy_tanks = self.get_tank_lists(player)
         player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
         context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks, GameState().attack_matrix)
-        for i, (_, _) in enumerate(player.tanks):
+        for i in range(len(player.tanks)):
             context.update_curr_tank_index(i)
             self.brain.act(context)
 
@@ -82,5 +82,5 @@ class AI(metaclass=Singleton):
                     break
 
     def finish_game(self) -> None:
-        for pl in self.players:
-            pl.logout()
+        for player in self.players:
+            player.logout()

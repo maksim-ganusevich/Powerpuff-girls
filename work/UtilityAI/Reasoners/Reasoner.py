@@ -1,6 +1,6 @@
 from typing import List
-from work.UtilityAI.Actions.Action import Action
-from work.UtilityAI.Context import Context
+from work.UtilityAI.Actions import Action
+from work.UtilityAI import Context
 
 
 # Responsible for evaluating every action and picking the best one

@@ -18,7 +18,7 @@ class Brain:
         act_target = ActionTarget([ConsiderationTargetHealth(Curve.linear_quadratic,
                                                              CurveRules(m=4, k=2, inverse=True)),
                                    ConsiderationTargetDistance(Curve.linear_quadratic,
-                                                               CurveRules(m=Map().size*2, k=0.2, inverse=True)),
+                                                               CurveRules(m=Map.map_size * 2, k=0.2, inverse=True)),
                                    ConsiderationNeutralityRule()])
         self.reasoner_target = ReasonerGetTarget([act_target])
 
@@ -27,8 +27,9 @@ class Brain:
                                                            CurveRules(m=4, k=2, inverse=True)),
                                  ConsiderationTargetInRange(),
                                  ConsiderationNeutralityRule()])
-        act_capture_base = ActionCaptureBase([ConsiderationBaseDistance(Curve.linear_quadratic,
-                                                                        CurveRules(m=Map().size+1, k=0.5, inverse=True))])
+        act_capture_base = ActionCaptureBase([ConsiderationBaseDistance(Curve.linear_quadratic, 
+                                                                        CurveRules(m=Map.map_size + 1, k=0.5,
+                                                                                   inverse=True))])
         self.reasoner = Reasoner([act_shoot, act_capture_base])
 
     # picking the best action and executing it
