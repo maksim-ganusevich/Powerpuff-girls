@@ -1,10 +1,9 @@
-from work import Map
-from work.UtilityAI.Actions import ActionShoot, ActionTarget, ActionCaptureBase
-from work.UtilityAI.Reasoners import ReasonerGetTarget, Reasoner
-from .Considerations import ConsiderationTargetInRange, ConsiderationNeutralityRule, \
-    ConsiderationTargetDistance, ConsiderationTargetHealth, ConsiderationBaseDistance
-from . import Context
+from work.UtilityAI.Actions import *
+from work.UtilityAI.Reasoners import *
+from work.UtilityAI.Considerations import *
+from .Context import Context
 from .Curve import Curve, CurveRules
+from work.Map import Map
 
 
 # Combining reasoners, actions and considerations
@@ -28,7 +27,7 @@ class Brain:
                                                            CurveRules(m=4, k=2, inverse=True)),
                                  ConsiderationTargetInRange(),
                                  ConsiderationNeutralityRule()])
-        act_capture_base = ActionCaptureBase([ConsiderationBaseDistance(Curve.linear_quadratic,
+        act_capture_base = ActionCaptureBase([ConsiderationBaseDistance(Curve.linear_quadratic, 
                                                                         CurveRules(m=Map.map_size + 1, k=0.5,
                                                                                    inverse=True))])
         self.reasoner = Reasoner([act_shoot, act_capture_base])

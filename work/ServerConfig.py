@@ -1,0 +1,5 @@
+ADDRESS = "wgforge-srv.wargaming.net"
+PORT = 443
+ACTION_LENGTH = 4
+RESULT_LENGTH = 4
+DATA_LENGTH = 4

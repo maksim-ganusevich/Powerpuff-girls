@@ -1,36 +1,19 @@
 import json
 import socket
 import logging
-from enum import Enum
 from typing import Optional, Dict
+from work.ServerCommands import Action, Result
+from work.ServerConfig import ADDRESS, PORT, ACTION_LENGTH, RESULT_LENGTH, DATA_LENGTH
+
 logging.basicConfig(level=logging.DEBUG,
                     format='\n%(levelname)s - %(asctime)s - %(message)s',
                     datefmt='%H:%M:%S')
 
-
-class Result(Enum):
-    OKEY = 0
-    BAD_COMMAND = 1
-    ACCESS_DENIED = 2
-    INAPPROPRIATE_GAME_STATE = 3
-    TIMEOUT = 4
-    INTERNAL_SERVER_ERROR = 500
-
-
-class Action(Enum):
-    LOGIN = 1
-    LOGOUT = 2
-    MAP = 3
-    GAME_STATE = 4
-    GAME_ACTIONS = 5
-    TURN = 6
-    CHAT = 100
-    MOVE = 101
-    SHOOT = 102
+logging.basicConfig(level=logging.DEBUG, format='\n%(levelname)s - %(asctime)s - %(message)s', datefmt='%H:%M:%S')
 
 
 class ServerHandler:
-    __serverAddressPort = ("wgforge-srv.wargaming.net", 443)
+    __serverAddressPort = (ADDRESS, PORT)
     __bufferSize = 4096
 
     def __init__(self):
@@ -44,15 +27,15 @@ class ServerHandler:
         # request format: {action (4 bytes)} + {data length (4 bytes)} +
         # + {bytes of UTF-8 string with data in JSON format}
         if send_req:
-            bytes_to_send = action.to_bytes(4, byteorder='little')
+            bytes_to_send = action.value.to_bytes(ACTION_LENGTH, byteorder='little')
             data_length = 0
             if data:
                 json_value = json.dumps(data, separators=(',', ':'))
                 data_length = len(json_value)
-                bytes_to_send += data_length.to_bytes(4, byteorder='little')\
-                                 + bytes(json_value.encode('utf-8'))
+                bytes_to_send += \
+                    data_length.to_bytes(DATA_LENGTH, byteorder='little') + bytes(json_value.encode('utf-8'))
             else:
-                bytes_to_send += data_length.to_bytes(4, byteorder='little')
+                bytes_to_send += data_length.to_bytes(DATA_LENGTH, byteorder='little')
             self.__TCPSocket.sendall(bytes_to_send)
 
         # receiving answer
@@ -63,15 +46,16 @@ class ServerHandler:
                 msg_from_server = self.__TCPSocket.recv(self.__bufferSize)
                 buffer += msg_from_server
 
-                if len(buffer) >= 8:  # getting first 8 bytes (result + data_length)
+                if len(buffer) >= RESULT_LENGTH + DATA_LENGTH:  # getting first bytes (result + data_length)
                     if not data_length:
-                        data_length = int.from_bytes(buffer[4:8], "little")
-                    if len(buffer) >= data_length + 8:  # extra data with the size of data_length
+                        data_length = int.from_bytes(buffer[RESULT_LENGTH:RESULT_LENGTH + DATA_LENGTH], "little")
+                    # extra data with the size of data_length
+                    if len(buffer) >= RESULT_LENGTH + DATA_LENGTH + data_length:
                         break
 
-            code_result = int.from_bytes(buffer[:4], "little")
+            code_result = int.from_bytes(buffer[:RESULT_LENGTH], "little")
             print_log = logging.info
-            if code_result != 0:
+            if Result(code_result) != Result.OKEY:
                 print_log = logging.error
             print_log('\n---' + str(Action(action)) + '---' +
                       "\nResult: " + str(Result(code_result)) +
@@ -82,7 +66,7 @@ class ServerHandler:
                 return None
 
             if data_length > 0:
-                data = json.loads(buffer[8:].decode('utf-8'))
+                data = json.loads(buffer[RESULT_LENGTH + DATA_LENGTH:].decode('utf-8'))
                 return data
 
     # returns id of the current player
@@ -92,9 +76,9 @@ class ServerHandler:
         data = {"name": name, "password": password, "game": game,
                 "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}
-        login = self.send_request(1, data)
+        login = self.send_request(Action.LOGIN, data)
         return login["idx"]
 
     def send_shoot(self, id: int, shoot_pos: dict) -> None:
         data = {"vehicle_id": id, "target": shoot_pos}
-        self.send_request(102, data)
+        self.send_request(Action.SHOOT, data)

@@ -1,7 +1,7 @@
 from typing import List
-from work import Map
+from .Tank import Tank
+from work.Map import Map
 from work.Hexagon import Hex
-from . import Tank
 
 
 class AtSPG(Tank):
@@ -14,4 +14,4 @@ class AtSPG(Tank):
         return self.position + direction
 
     def get_firing_range(self) -> List[Hex]:
-        return Map.get_hexes_of_axes(self.position, 3)
+        return Map().get_hexes_of_axes(self.position, 3)

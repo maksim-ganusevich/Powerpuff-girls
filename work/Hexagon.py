@@ -1,4 +1,5 @@
 from typing import Dict
+from typing import List
 
 
 class Hex:
@@ -46,6 +47,13 @@ class Hex:
         return Hex(Hex.lerp(a.x, b.x, t),
                    Hex.lerp(a.y, b.y, t),
                    Hex.lerp(a.z, b.z, t))
+
+    @staticmethod
+    def dict_to_hex_list(dct: dict) -> List["Hex"]:
+        res = []
+        for h in dct:
+            res.append(Hex(h['x'], h['y'], h['z']))
+        return res
 
     def normalize(self):
         length = self.distance(Hex(0, 0, 0), self)

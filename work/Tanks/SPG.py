@@ -1,6 +1,6 @@
 from typing import List
 from work.Hexagon import Hex
-from work import Map
+from work.Map import Map
 from . import Tank
 
 
@@ -9,4 +9,4 @@ class SPG(Tank):
         super(SPG, self).__init__(id, hp, 1, 1, 1, position, spawn_pos, owner)
 
     def get_firing_range(self) -> List[Hex]:
-        return Map.get_hexes_of_circle(self.position, 3)
+        return Map().get_hexes_of_circle(self.position, 3)

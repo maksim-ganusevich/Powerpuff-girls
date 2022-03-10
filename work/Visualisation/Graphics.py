@@ -2,7 +2,8 @@ from sys import exit
 import pygame
 from pygame.color import THECOLORS
 from math import fabs, sin, pi, sqrt, cos
-from work.GameState import Info
+from work.GameState import GameState
+from work.Map import Map
 from work.Singleton import Singleton
 
 COLORS = [(46, 196, 182), (231, 29, 54), (255, 159, 28)]
@@ -21,10 +22,9 @@ ICONS_PATH = {
 class Graphics(metaclass=Singleton):
 
     def __init__(self):
-        self.info = Info()
         self.__screen_width = 1280
         self.__screen_height = 720
-        self.__hex_radius = self.__screen_height / self.info.size / 3.5
+        self.__hex_radius = self.__screen_height / Map().size / 3.5
         self.__screen = pygame.display.set_mode((self.__screen_width, self.__screen_height))
         self.__hex_cords = self.__get_hexes_coord()
         self.__tank_colors = None
@@ -32,7 +32,7 @@ class Graphics(metaclass=Singleton):
 
     def get_colors(self):
         color_dict = dict()
-        for color_id, player in enumerate(self.info.players):
+        for color_id, player in enumerate(GameState().players):
             color_dict[player["idx"]] = COLORS[color_id]
         return color_dict
 
@@ -62,7 +62,7 @@ class Graphics(metaclass=Singleton):
         """
         center = self.__screen_height // 2
 
-        map_indexes_arr = self.get_all_map_indexes(self.info.size)
+        map_indexes_arr = self.get_all_map_indexes(Map().size)
         hex_cords = dict()
         for index in map_indexes_arr:
             radius = self.__hex_radius
@@ -79,7 +79,7 @@ class Graphics(metaclass=Singleton):
         pygame.draw.polygon(self.__screen, color, points, width)
 
     def __get_name(self, player_id: int) -> str:
-        for pl in self.info.players:
+        for pl in GameState().players:
             if player_id == pl["idx"]:
                 return pl["name"]
 
@@ -91,24 +91,24 @@ class Graphics(metaclass=Singleton):
                          (self.__screen_width * 0.57, self.__screen_height),
                          int(self.__hex_radius))
         for value in self.__hex_cords.values():
-            hex_r = self.__screen_height / self.info.size / 3.5
+            hex_r = self.__screen_height / Map().size / 3.5
             self.__draw_hex((242, 218, 145), 0, hex_r, value)
             self.__draw_hex(THECOLORS['black'], 3, hex_r, value)
 
     def __draw_obstacles(self):
-        for obstacle in self.info.obstacle:
-            position = self.__hex_cords[(obstacle["x"], obstacle["y"], obstacle["z"])]
+        for obstacle in Map().obstacles:
+            position = self.__hex_cords[(obstacle.x, obstacle.y, obstacle.z)]
             self.__draw_hex((20, 30, 38), 0, self.__hex_radius, position)
             self.__draw_hex(THECOLORS['black'], 3, self.__hex_radius, position)
 
     def __draw_base(self):
-        for base_hex in self.info.base:
-            position = self.__hex_cords[tuple(base_hex.values())]
+        for base_hex in Map().base:
+            position = self.__hex_cords[(base_hex.x, base_hex.y, base_hex.z)]
             self.__draw_hex((154, 205, 50), 0, self.__hex_radius, position)
             self.__draw_hex(THECOLORS['black'], 3, self.__hex_radius, position)
 
     def __draw_catapult(self):
-        for catapult in self.info.catapult:
+        for catapult in Map().catapult:
             pos_key = tuple(catapult.values())
             position = self.__hex_cords[pos_key]
             catapult_surf = pygame.image.load(ICONS_PATH["catapult"])
@@ -119,7 +119,7 @@ class Graphics(metaclass=Singleton):
             self.__screen.blit(scale, catapult_rect)
 
     def __draw_hard_repair(self):
-        for hard_repair in self.info.hard_repair:
+        for hard_repair in Map().hard_repair:
             pos_key = tuple(hard_repair.values())
             position = self.__hex_cords[pos_key]
             hard_repair_surf = pygame.image.load(ICONS_PATH["hard_repair"])
@@ -130,7 +130,7 @@ class Graphics(metaclass=Singleton):
             self.__screen.blit(scale, hard_repair_rect)
 
     def __draw_light_repair(self):
-        for light_repair in self.info.light_repair:
+        for light_repair in Map().light_repair:
             pos_key = tuple(light_repair.values())
             position = self.__hex_cords[pos_key]
             light_repair_surf = pygame.image.load(ICONS_PATH["light_repair"])
@@ -142,8 +142,8 @@ class Graphics(metaclass=Singleton):
 
     def __draw_tanks(self):
         font_hp = pygame.font.SysFont("calibri", int(self.__hex_radius), True)
-        if self.info.current_player_idx:
-            for tank in self.info.vehicles.values():
+        if GameState().current_player_idx:
+            for tank in GameState().vehicles.values():
                 owner_id = tank["player_id"]
                 tank_type = tank["vehicle_type"]
                 pos_key = (tuple(tank["position"].values()))
@@ -161,7 +161,7 @@ class Graphics(metaclass=Singleton):
                 pos = (position[0] - self.__hex_radius * 0.7, position[1] - self.__hex_radius * 0.7)
                 self.__screen.blit(hp_str, pos)
         else:
-            for team_tanks in self.info.spawn_points:
+            for team_tanks in Map().spawn_points:
                 for t_type, tank in team_tanks.items():
                     pos_key = (tuple(tank[0].values()))
                     position = self.__hex_cords[pos_key]
@@ -174,7 +174,7 @@ class Graphics(metaclass=Singleton):
 
     def __draw_turns(self):
         font = pygame.font.SysFont("calibri", int(self.__font_size * 1.5), False)
-        turns_message = "TURN: %s/%s" % (self.info.current_turn, self.info.num_turns)
+        turns_message = "TURN: %s/%s" % (GameState().current_turn, GameState().num_turns)
         text = font.render(turns_message, True, (242, 153, 75))
         pos = self.__screen_width * 205 / 300, self.__screen_height / 2 - self.__hex_radius * 1.5
         self.__screen.blit(text, pos)
@@ -185,7 +185,7 @@ class Graphics(metaclass=Singleton):
         text = font_b.render("PLAYERS:", True, (242, 153, 75))
         position = self.__screen_width * 2 / 3, self.__screen_height / 15
         self.__screen.blit(text, position)
-        for i, player in enumerate(self.info.players):
+        for i, player in enumerate(GameState().players):
             player_message = "ID: %s   NAME: %s" % (player["idx"], player["name"])
             text = font_l.render(player_message, True, self.__tank_colors[player["idx"]])
             position = self.__screen_width * 1.9 / 3, self.__screen_height / 7.5 + self.__hex_radius * i * 1.2
@@ -198,7 +198,7 @@ class Graphics(metaclass=Singleton):
         position = self.__screen_width * 2 / 3, self.__screen_height * 3 / 4
         self.__screen.blit(text, position)
         position = self.__screen_width * 1.9 / 3, self.__screen_height * 3 / 4 + self.__hex_radius
-        for xid, values in self.info.win_points.items():
+        for xid, values in GameState().win_points.items():
             player_message = "ID: %s   capture: %s   kill: %s" % (xid, values["capture"], values["kill"])
             text = font_l.render(player_message, True, self.__tank_colors[int(xid)])
             position = self.__screen_width * 1.9 / 3, position[1] + self.__hex_radius * 1.2
@@ -210,8 +210,8 @@ class Graphics(metaclass=Singleton):
         self.__draw_win_points()
 
     def __draw_winner(self):
-        if self.info.finished:
-            winner_id = self.info.winner
+        if GameState().finished:
+            winner_id = GameState().winner
             rect = pygame.Rect(
                 (self.__screen_width * 0.2, self.__screen_height * 0.3, self.__screen_width * 0.6,
                  self.__screen_height * 0.4))
@@ -231,10 +231,10 @@ class Graphics(metaclass=Singleton):
         self.__draw_catapult()
         self.__draw_hard_repair()
         self.__draw_light_repair()
-        if self.info.current_player_idx and not self.__tank_colors:
+        if GameState().current_player_idx and not self.__tank_colors:
             self.__tank_colors = self.get_colors()
         self.__draw_tanks()
-        if self.info.current_player_idx:
+        if GameState().current_player_idx:
             self.__draw_info()
             self.__draw_winner()
 
