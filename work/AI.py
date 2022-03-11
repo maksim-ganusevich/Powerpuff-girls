@@ -14,15 +14,11 @@ logging.basicConfig(format='%(levelname)s - %(asctime)s - %(message)s', datefmt=
 class AI(metaclass=Singleton):
     def __init__(self, players: List[Player]):
         self.players = players
-        self.game_name = ''
-        for player in self.players:
-            self.game_name += player.name
-        self.game_name += random.choice("~`,./?!*+-^&@#$%_=")
         self.brain = Brain()
 
-    def connect(self) -> None:
+    def connect(self, game_name, num_players, num_turns) -> None:
         for pl in self.players:
-            pl.connect(self.game_name, 3)
+            pl.connect(game_name, num_players, num_turns)
         self.players[0].get_map()  # initializes Map singleton
         self.brain.init_reasoners()
 
@@ -68,12 +64,10 @@ class AI(metaclass=Singleton):
 
     def start_game(self) -> None:
         self.players[0].get_state()  # initializes GameState singleton
-
         while True:
             if GameState().finished:
                 self.finish_game()
                 break
-
             for pl in self.players:
                 if GameState().current_player_idx == pl.id:
                     self.make_action(pl)
