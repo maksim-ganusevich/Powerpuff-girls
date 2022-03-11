@@ -23,9 +23,14 @@ Now go to the root folder of the project and run the following command:
 ***
 ***how to launch***
 <br>
-Run the command in the root folder of the project:
-<br>
+Run the command in the root folder of the project without arguments to run a test game with 3 players controlled by one bot:
+
 ```python main.py```
+
+Run the command in the root folder of the project with optional arguments to run a test game with 1 players:
+
+```python main.py -n [player name] -p [password] -g [game name] -np [number of players] -nt [number of turns] -obs [0/1 is observer]```
+##### competitive game mode (1 player): #####
 ***
 ***Our team:***
 <br>

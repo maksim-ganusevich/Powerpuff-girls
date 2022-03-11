@@ -70,9 +70,9 @@ class ServerHandler:
                 return data
 
     # returns id of the current player
-    def send_login(self, name: str, password="", game: str = None,
-                   num_turns: int = None, num_players=1,
-                   is_observer=False) -> int:
+    def send_login(self, name: str, password: str, game: str,
+                   num_turns: int, num_players: int,
+                   is_observer: bool) -> int:
         data = {"name": name, "password": password, "game": game,
                 "num_turns": num_turns, "num_players": num_players,
                 "is_observer": is_observer}

@@ -7,15 +7,18 @@ from work.ServerCommands import Action
 
 
 class Player:
-    def __init__(self, name: str):
+    def __init__(self, name: str, password="", is_observer=False):
         self.name = name
-        self.password = ""
+        self.password = password
+        self.is_observer = is_observer
         self.server = ServerHandler()
         self.tanks = []
         self.id = None
 
-    def connect(self, game: str, num_players=1) -> None:
-        self.id = self.server.send_login(name=self.name, game=game, num_players=num_players)
+    def connect(self, game: str, num_players=1, num_turns = None) -> None:
+        self.id = self.server.send_login(name=self.name, password=self.password,
+                                         game=game, num_turns=num_turns,
+                                         num_players=num_players, is_observer=self.is_observer)
 
     def get_map(self) -> Dict:
         map_dict = self.server.send_request(Action.MAP)
