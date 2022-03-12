@@ -25,10 +25,9 @@ class Map(metaclass=Singleton):
         self.size = map_response["size"]
         self.name = map_response["name"]
         self.spawn_points = map_response["spawn_points"]
-        self.base = map_response["content"]["base"]
-        self.catapult = map_response["content"]["catapult"]
-        self.hard_repair = map_response["content"]["hard_repair"]
-        self.light_repair = map_response["content"]["light_repair"]
+        self.catapult = Hex.dict_to_hex_list(map_response["content"]["catapult"])
+        self.hard_repair = Hex.dict_to_hex_list(map_response["content"]["hard_repair"])
+        self.light_repair = Hex.dict_to_hex_list(map_response["content"]["light_repair"])
         self.base = Hex.dict_to_hex_list(map_response["content"]["base"])
         self.obstacles = Hex.dict_to_hex_list(map_response["content"]["obstacle"])
 
@@ -41,16 +40,19 @@ class Map(metaclass=Singleton):
         self.vehicles.remove(old_pos)
         self.vehicles.add(new_pos)
 
+    def get_closest_in_list(self, start: Hex, lst: List[Hex]) -> Hex:
+        min_dist, closest = self.size * 2, None
+        for h in lst:
+            dist = Hex.distance(start, h)
+            if dist < min_dist:
+                min_dist, closest = dist, h
+        return closest
+
     def hex_is_free(self, h: Hex) -> bool:
-        return h not in self.obstacles and h not in self.vehicles
+        return h not in self.obstacles and h not in self.vehicles and self.in_map_boundaries(h)
 
     def in_map_boundaries(self, hex: Hex) -> bool:
         return max(abs(hex.x), abs(hex.y), abs(hex.z)) <= self.size
-
-    def get_free_base_hex(self, ) -> Hex:
-        for b in self.base:
-            if self.hex_is_free(b):
-                return b
 
     def get_free_neighbours(self, center: Hex) -> List[Hex]:
         results = []

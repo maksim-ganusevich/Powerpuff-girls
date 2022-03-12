@@ -4,3 +4,8 @@ from .ConsiderationTargetDistance import ConsiderationTargetDistance
 from .ConsiderationBaseDistance import ConsiderationBaseDistance
 from .ConsiderationTargetInRange import ConsiderationTargetInRange
 from .ConsiderationNeutralityRule import ConsiderationNeutralityRule
+from .ConsiderationTargetBaseCapture import ConsiderationTargetBaseCapture
+from .ConsiderationHexCost import ConsiderationHexCost
+from .ConsiderationMyHealth import ConsiderationMyHealth
+from .ConsiderationHexDistance import ConsiderationHexDistance
+from .ConsiderationCatapult import ConsiderationCatapult

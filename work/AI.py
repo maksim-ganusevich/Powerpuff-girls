@@ -34,7 +34,8 @@ class AI(metaclass=Singleton):
         }
         t_type, t_move_order = tank_types[tank_data["vehicle_type"]]
         return t_type(tank_id, tank_data["health"], tank_data["position"],
-                      tank_data["spawn_position"], tank_data["player_id"]), t_move_order
+                      tank_data["spawn_position"], tank_data["player_id"],
+                      tank_data["capture_points"], tank_data["shoot_range_bonus"]), t_move_order
 
     def get_tank_lists(self, player: Player) -> Tuple[List[Tuple[int, Tank]], List[Tank]]:
         player_tanks = []
@@ -52,6 +53,7 @@ class AI(metaclass=Singleton):
         player_tanks, enemy_tanks = self.get_tank_lists(player)
         player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
         context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks, GameState().attack_matrix)
+        print("==================")
         for i in range(len(player.tanks)):
             context.update_curr_tank_index(i)
             self.brain.act(context)

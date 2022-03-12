@@ -1,7 +1,8 @@
-from queue import PriorityQueue
+import random
+from queue import Queue, PriorityQueue
+from typing import List
 from work.Hexagon import Hex
 from work.Map import Map
-from typing import List
 
 
 def find_path(start: Hex, goal: Hex) -> List[Hex]:
@@ -18,7 +19,9 @@ def find_path(start: Hex, goal: Hex) -> List[Hex]:
         if current == goal:
             break
 
-        for next_hex in Map().get_free_neighbours(current):
+        neighbours = Map().get_free_neighbours(current)
+        random.shuffle(neighbours)  # paths variation
+        for next_hex in neighbours:
             new_cost = cost_so_far[current]  # + hex cost
             if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
                 cost_so_far[next_hex] = new_cost
@@ -36,14 +39,14 @@ def find_path(start: Hex, goal: Hex) -> List[Hex]:
     return path
 
 
-def move_to(start: Hex, goal: Hex, speed_points: int) -> Hex:
-    if not Map().in_map_boundaries(goal):
-        return start
-    path = find_path(start, goal)
-    if len(path) <= speed_points:
-        return goal
-    for i in range(speed_points, 0, -1):
-        final_hex = path[len(path) - i]  # intermediate hex on the path
-        if final_hex not in Map().vehicles:  # check if occupied by other vehicle
-            return final_hex
-    return start
+def get_in_range_from(center: Hex, start: Hex, rng: int, sp: int) -> List[Hex]:
+    hexes_in_range = []
+
+    for x in range(-sp, sp + 1):
+        for y in range(max(-sp, -x - sp), min(sp, -x + sp) + 1):
+            res = start + Hex(x, y, -x - y)
+            # store hexes that are in range from center
+            if Map().hex_is_free(res) and Hex.distance(center, res) == rng:
+                hexes_in_range.append(res)
+
+    return hexes_in_range
