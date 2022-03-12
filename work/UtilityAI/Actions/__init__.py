@@ -7,3 +7,4 @@ from .ActionPath import ActionPath
 from .ActionLightRepair import ActionLightRepair
 from .ActionHardRepair import ActionHardRepair
 from .ActionCatapult import ActionCatapult
+from .ActionFlee import ActionFlee
