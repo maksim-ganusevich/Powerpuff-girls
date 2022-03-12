@@ -30,7 +30,7 @@ class Brain:
 
         # action to select the best hex
         act_path = ActionPath([
-            ConsiderationHexCost(Curve.logistic),
+            ConsiderationHexCost(Curve.linear_quadratic),
             ConsiderationHexDistance(Curve.linear_quadratic, CurveRules(m=4, b=0.01))
         ])
         self.path_reasoner = ReasonerPath([act_path])
@@ -87,8 +87,12 @@ class Brain:
             ConsiderationHexDistance(Curve.logistic, CurveRules(m=3, k=0.2, inverse=True)),
             ConsiderationCatapult(Curve.logistic, CurveRules(m=0.2, k=0.6, inverse=True))
         ])
+        act_flee = ActionFlee([
+            ConsiderationAttacked(Curve.logistic),
+            ConsiderationMyCapture(Curve.logistic, CurveRules(m=1.1, k=0.2, inverse=True))
+        ])
 
-        return (Reasoner([act_shoot, act_capture_base, act_move_to_target, act_catapult]),
+        return (Reasoner([act_shoot, act_capture_base, act_move_to_target, act_catapult, act_flee]),
                 ReasonerGetTarget([act_target]))
 
     @staticmethod
@@ -107,7 +111,7 @@ class Brain:
             ConsiderationTargetHealth(Curve.linear_quadratic, CurveRules(m=4, k=2, inverse=True)),
             ConsiderationTargetInRange(Curve.linear_quadratic, CurveRules()),
             ConsiderationNeutralityRule(),
-            ConsiderationTargetBaseCapture(Curve.logistic, CurveRules(m=-0.1, k=0.1))
+            ConsiderationTargetBaseCapture(Curve.logistic, CurveRules(m=-0.9, k=0.1))
         ])
         act_capture_base = ActionCaptureBase([
             ConsiderationBaseDistance(Curve.sin, CurveRules(b=0.1, k=0.025))
@@ -119,11 +123,16 @@ class Brain:
         act_repair = ActionLightRepair([
             ConsiderationMyHealth(Curve.linear_quadratic, CurveRules(b=-1, inverse=True)),
             ConsiderationTargetBaseCapture(Curve.logistic, CurveRules(m=1.5, k=0.2, inverse=True)),
-            ConsiderationHexDistance(Curve.linear_quadratic, CurveRules(m=Map().size, inverse=True))
+            ConsiderationHexDistance(Curve.linear_quadratic, CurveRules(m=Map().size, inverse=True)),
+            ConsiderationMyCapture(Curve.logistic, CurveRules(m=1.1, k=0.2, inverse=True)),
+            ConsiderationTargetInRange(Curve.linear_quadratic, CurveRules(m=2, k=1, b=0.3, inverse=True)),
+            ConsiderationTargetHealth(Curve.linear_quadratic, CurveRules(m=0.7, k=0.4, b=-1))
         ])
         act_catapult = ActionCatapult([
             ConsiderationHexDistance(Curve.logistic, CurveRules(m=2, k=0.2, inverse=True)),
-            ConsiderationCatapult(Curve.logistic, CurveRules(m=0.2, k=0.6, inverse=True))
+            ConsiderationCatapult(Curve.logistic, CurveRules(m=0.2, k=0.6, inverse=True)),
+            ConsiderationTargetInRange(Curve.linear_quadratic, CurveRules(m=2, k=1, b=0.3, inverse=True)),
+            ConsiderationTargetHealth(Curve.linear_quadratic, CurveRules(m=0.7, k=0.4, b=-1))
         ])
 
         return (Reasoner([act_shoot, act_capture_base, act_move_to_target, act_repair, act_catapult]),
@@ -157,14 +166,13 @@ class Brain:
         act_repair = ActionHardRepair([
             ConsiderationMyHealth(Curve.linear_quadratic, CurveRules(m=2, b=-0.5, inverse=True)),
             ConsiderationTargetBaseCapture(Curve.logistic, CurveRules(m=1.5, k=0.2, inverse=True)),
-            ConsiderationHexDistance(Curve.linear_quadratic, CurveRules(m=Map().size, inverse=True))
-        ])
-        act_catapult = ActionCatapult([
-            ConsiderationHexDistance(Curve.logistic, CurveRules(m=1, k=0.2, inverse=True)),
-            ConsiderationCatapult(Curve.logistic, CurveRules(m=0.2, k=0.6, inverse=True))
+            ConsiderationHexDistance(Curve.linear_quadratic, CurveRules(m=Map().size, inverse=True)),
+            ConsiderationMyCapture(Curve.logistic, CurveRules(m=1.1, k=0.2, inverse=True)),
+            ConsiderationTargetInRange(Curve.linear_quadratic, CurveRules(m=2, k=1, b=0.3, inverse=True)),
+            ConsiderationTargetHealth(Curve.linear_quadratic, CurveRules(m=0.7, k=0.4, b=-1))
         ])
 
-        return (Reasoner([act_shoot, act_capture_base, act_move_to_target, act_repair, act_catapult]),
+        return (Reasoner([act_shoot, act_capture_base, act_move_to_target, act_repair]),
                 ReasonerGetTarget([act_target]))
 
     @staticmethod
@@ -175,7 +183,7 @@ class Brain:
             ConsiderationTargetDistance(Curve.linear_quadratic, CurveRules(m=Map().size * 2, k=0.2, inverse=True)),
             ConsiderationNeutralityRule(),
             ConsiderationTargetBaseCapture(Curve.logistic, CurveRules(m=0, k=0.1)),
-            ConsiderationTargetInRange(Curve.linear_quadratic, CurveRules(m=1.7, b=0.2))
+            ConsiderationTargetInRange(Curve.linear_quadratic, CurveRules(m=1, b=0.1))
         ])
 
         # actions for main reasoner
@@ -221,10 +229,10 @@ class Brain:
             context.path_reasoner = self.path_reasoner
         reasoner_main, reasoner_target = self.get_reasoner(repr(type(context.get_curr_tank())))
 
-        # if context.player.name == "Semen":
-        #     reasoner_main, reasoner_target = self.get_empty_reasoners()
-        # if context.player.name != "Carlos":
-        #     reasoner_main, reasoner_target = self.get_stupid_reasoner()
+        if context.player.name == "Semen":
+            reasoner_main, reasoner_target = self.get_empty_reasoners()
+        if context.player.name != "Carlos":
+            reasoner_main, reasoner_target = self.get_stupid_reasoner()
 
         target_index = reasoner_target.get_target_index(context)
         context.target_index = target_index

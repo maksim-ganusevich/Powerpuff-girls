@@ -1,6 +1,7 @@
 from threading import Thread
 import sys
 import argparse
+import random
 from work.AI import AI
 from work.Player import Player
 from work.Visualisation import Graphics
@@ -23,7 +24,7 @@ def test_game():
     player2 = Player(name="Semen")
     player3 = Player(name="Woody")
     ai_ = AI([player1, player2, player3])
-    ai_.connect(game_name="test_game", num_turns=None, num_players=3)
+    ai_.connect(game_name="test_game" + random.choice("1234567890abc"), num_turns=None, num_players=3)
     th_ = Thread(target=ai_.start_game)
     th_.start()
     graphics = Graphics()

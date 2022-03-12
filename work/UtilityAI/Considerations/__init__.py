@@ -9,3 +9,5 @@ from .ConsiderationHexCost import ConsiderationHexCost
 from .ConsiderationMyHealth import ConsiderationMyHealth
 from .ConsiderationHexDistance import ConsiderationHexDistance
 from .ConsiderationCatapult import ConsiderationCatapult
+from .ConsiderationMyCapture import ConsiderationMyCapture
+from .ConsiderationAttacked import ConsiderationAttacked

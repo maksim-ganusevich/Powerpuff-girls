@@ -22,6 +22,12 @@ class ReasonerPath(Reasoner):
                 max_weight, best_base_hex = weight, b
         return best_base_hex
 
+    def get_best_hex_around(self, context: Context) -> Hex:
+        curr_tank = context.get_curr_tank()
+        hexes_range = Map().get_hexes_in_range(curr_tank.position, curr_tank.sp)
+        max_weight, best_hex = self.eval_possible_hexes(context, hexes_range)
+        return best_hex
+
     def get_best_hex(self, context: Context, goal: Hex, use_range: bool = False) -> Hex:
         curr_tank = context.get_curr_tank()
 
