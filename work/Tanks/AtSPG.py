@@ -5,8 +5,9 @@ from work.Hexagon import Hex
 
 
 class AtSPG(Tank):
-    def __init__(self, idx, hp, position, spawn_pos, owner):
-        super(AtSPG, self).__init__(idx, hp, 1, 1, 2, position, spawn_pos, owner)
+    def __init__(self, idx, hp, position, spawn_pos, owner, capture_points, shoot_range_bonus):
+        super(AtSPG, self).__init__(idx, hp, 1, 1, 2, 1, 3,
+                                    position, spawn_pos, owner, capture_points, shoot_range_bonus)
 
     def get_shoot_pos(self, target: Hex) -> Hex:
         # for AtSPG: Target hex for direction indication must be adjacent to the vehicle
@@ -14,4 +15,4 @@ class AtSPG(Tank):
         return self.position + direction
 
     def get_firing_range(self) -> List[Hex]:
-        return Map().get_hexes_of_axes(self.position, 3)
+        return Map().get_hexes_of_axes(self.position, self.shoot_range_max + self.shoot_range_bonus)

@@ -111,7 +111,7 @@ class Graphics(metaclass=Singleton):
 
     def __draw_catapult(self):
         for catapult in Map().catapult:
-            pos_key = tuple(catapult.values())
+            pos_key = (catapult.x, catapult.y, catapult.z)
             position = self.__hex_cords[pos_key]
             catapult_surf = pygame.image.load(ICONS_PATH["catapult"])
             scale = pygame.transform.smoothscale(
@@ -122,7 +122,7 @@ class Graphics(metaclass=Singleton):
 
     def __draw_hard_repair(self):
         for hard_repair in Map().hard_repair:
-            pos_key = tuple(hard_repair.values())
+            pos_key = (hard_repair.x, hard_repair.y, hard_repair.z)
             position = self.__hex_cords[pos_key]
             hard_repair_surf = pygame.image.load(ICONS_PATH["hard_repair"])
             scale = pygame.transform.smoothscale(
@@ -133,7 +133,7 @@ class Graphics(metaclass=Singleton):
 
     def __draw_light_repair(self):
         for light_repair in Map().light_repair:
-            pos_key = tuple(light_repair.values())
+            pos_key = (light_repair.x, light_repair.y, light_repair.z)
             position = self.__hex_cords[pos_key]
             light_repair_surf = pygame.image.load(ICONS_PATH["light_repair"])
             scale = pygame.transform.smoothscale(
@@ -215,14 +215,14 @@ class Graphics(metaclass=Singleton):
         if GameState().finished:
             winner_id = GameState().winner
             rect = pygame.Rect(
-                (self.__screen_width * 0.2, self.__screen_height * 0.3, self.__screen_width * 0.6,
-                 self.__screen_height * 0.4))
+                (self.__screen_width * 0.2, self.__screen_height * 0.1, self.__screen_width * 0.6,
+                 self.__screen_height * 0.2))
             pygame.draw.rect(self.__screen, (119, 148, 166), rect, 0)
             pygame.draw.rect(self.__screen, THECOLORS['black'], rect, 5)
             font = pygame.font.SysFont("calibri", self.__font_size * 2, True)
             win_message = "%s win!" % self.__get_name(winner_id)
             text = font.render(win_message, True, THECOLORS['black'])
-            text_rect = text.get_rect(center=(self.__screen_width / 2, self.__screen_height / 2))
+            text_rect = text.get_rect(center=(self.__screen_width / 2, self.__screen_height / 4))
             self.__screen.blit(text, text_rect)
 
     def __draw_all(self):

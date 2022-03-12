@@ -57,12 +57,10 @@ class ServerHandler:
             print_log = logging.info
             if Result(code_result) != Result.OKEY:
                 print_log = logging.error
-            print_log('\n---' + str(Action(action)) + '---' +
-                      "\nResult: " + str(Result(code_result)) +
-                      "\nData length: " + str(data_length) +
-                      "\nFull response: " + str(buffer))
-
-            if Result(code_result) != Result.OKEY:
+                print_log('\n---' + str(Action(action)) + '---' +
+                          "\nResult: " + str(Result(code_result)) +
+                          "\nData length: " + str(data_length) +
+                          "\nFull response: " + str(buffer))
                 return None
 
             if data_length > 0:

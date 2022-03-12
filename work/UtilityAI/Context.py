@@ -11,6 +11,8 @@ class Context:
         self.player = player
         self.curr_tank_index = curr_tank_index
         self.target_index = 0
+        self.desired_hex = None
+        self.path_reasoner = None
         self.player_tanks = player_tanks
         self.enemy_tanks = enemy_tanks
         self.attack_matrix = attack_matrix
