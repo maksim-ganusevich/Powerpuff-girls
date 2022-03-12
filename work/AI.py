@@ -62,17 +62,23 @@ class AI(metaclass=Singleton):
         for player in self.players:
             player.turn(send_r=False)
 
+    def send_solo_turn(self):
+        if len(self.players) == 1:
+            while GameState().current_player_idx != self.players[0].id:
+                self.send_turn()
+                self.players[0].get_state()
+
     def start_game(self) -> None:
-        self.players[0].get_state()  # initializes GameState singleton
         while True:
+            self.players[0].get_state()  # initializes GameState singleton
             if GameState().finished:
                 self.finish_game()
                 break
             for pl in self.players:
+                self.send_solo_turn()
                 if GameState().current_player_idx == pl.id:
                     self.make_action(pl)
                     self.send_turn()
-                    pl.get_state()  # updates GameState singleton
                     break
 
     def finish_game(self) -> None:

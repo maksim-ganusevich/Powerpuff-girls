@@ -3,7 +3,7 @@ from work import Singleton
 
 class GameState(metaclass=Singleton):
     def __init__(self):
-        self.num_players = 3
+        self.num_players = 1
         self.num_turns = 45
         self.current_turn = 0
         self.players = []
