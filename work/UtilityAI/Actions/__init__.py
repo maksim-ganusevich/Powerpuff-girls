@@ -2,3 +2,8 @@ from .Action import Action
 from .ActionTarget import ActionTarget
 from .ActionShoot import ActionShoot
 from .ActionCaptureBase import ActionCaptureBase
+from .ActionMoveToTarget import ActionMoveToTarget
+from .ActionPath import ActionPath
+from .ActionLightRepair import ActionLightRepair
+from .ActionHardRepair import ActionHardRepair
+from .ActionCatapult import ActionCatapult

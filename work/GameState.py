@@ -14,6 +14,7 @@ class GameState(metaclass=Singleton):
         self.winner = None
         self.win_points = dict()
         self.catapult_usage = []
+        self.max_catapult_usage = 3
 
     def set_game_state(self, gs_response):
         self.num_players = gs_response["num_players"]

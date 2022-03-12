@@ -4,6 +4,5 @@ from work.UtilityAI import Context
 
 class ConsiderationTargetInRange(Consideration):
     def score(self, context: Context) -> float:
-        if context.get_target().position not in context.get_curr_tank().get_firing_range():
-            return 0  # eliminates shoot action
-        return 1
+        in_range = context.get_target().position in context.get_curr_tank().get_firing_range()
+        return self.eval(in_range)
