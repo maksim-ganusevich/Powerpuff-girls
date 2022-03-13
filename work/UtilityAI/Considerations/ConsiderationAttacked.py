@@ -15,5 +15,5 @@ class ConsiderationAttacked(Consideration):
             if count > attacks_by_single_enemy:
                 attacks_by_single_enemy = count
         # curve slope depends on curr hp
-        self.rules = CurveRules(m=context.get_curr_tank().hp-2, inverse=True)
+        self.rules = CurveRules(m=context.get_curr_tank().hp-0.7, inverse=True)
         return self.eval(attacks_by_single_enemy)

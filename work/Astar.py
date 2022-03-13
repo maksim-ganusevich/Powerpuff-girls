@@ -1,5 +1,5 @@
 import random
-from queue import Queue, PriorityQueue
+from queue import PriorityQueue
 from typing import List
 from work.Hexagon import Hex
 from work.Map import Map
