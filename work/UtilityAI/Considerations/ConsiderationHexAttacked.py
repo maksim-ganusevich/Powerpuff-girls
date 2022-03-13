@@ -2,11 +2,11 @@ from . import Consideration
 from work.UtilityAI import Context
 from work.GameState import GameState
 from ..Curve import CurveRules
-from work.Map import Map
 
 
-class ConsiderationHexCost(Consideration):
+class ConsiderationHexAttacked(Consideration):
     def score(self, context: Context) -> float:
+        # how many enemy tanks attack desired hex
         attacks_by_single_enemy = 0
         for pl in GameState().players:
             count = 0
@@ -17,9 +17,5 @@ class ConsiderationHexCost(Consideration):
                 attacks_by_single_enemy = count
         # curve slope depends on curr hp
         self.rules = CurveRules(m=context.get_curr_tank().hp, inverse=True)
-        if context.desired_hex in Map().base:
-            if context.get_curr_tank().position not in Map().base:
-                self.rules.b = 0.03
-            else:
-                self.rules.b = 0.01
+
         return self.eval(attacks_by_single_enemy)
