@@ -214,14 +214,14 @@ class Graphics(metaclass=Singleton):
     def __draw_winner(self):
         if GameState().finished:
             winner_id = GameState().winner
-            rect = pygame.Rect(
-                (self.__screen_width * 0.2, self.__screen_height * 0.3, self.__screen_width * 0.6,
-                 self.__screen_height * 0.4))
-            pygame.draw.rect(self.__screen, (119, 148, 166), rect, 0)
-            pygame.draw.rect(self.__screen, THECOLORS['black'], rect, 5)
-            font = pygame.font.SysFont("calibri", self.__font_size * 2, True)
+            # rect = pygame.Rect(
+            #     (self.__screen_width * 0.2, self.__screen_height * 0.3, self.__screen_width * 0.6,
+            #      self.__screen_height * 0.4))
+            # pygame.draw.rect(self.__screen, (119, 148, 166), rect, 0)
+            # pygame.draw.rect(self.__screen, THECOLORS['black'], rect, 5)
+            font = pygame.font.SysFont("calibri", self.__font_size * 2, False)
             win_message = "%s win!" % self.__get_name(winner_id)
-            text = font.render(win_message, True, THECOLORS['black'])
+            text = font.render(win_message, True, self.__tank_colors[winner_id])
             text_rect = text.get_rect(center=(self.__screen_width / 2, self.__screen_height / 2))
             self.__screen.blit(text, text_rect)
 
