@@ -18,7 +18,6 @@ def createParser():
     return parser
 
 
-
 def test_game():
     player1 = Player(name="Carlos")
     player2 = Player(name="Semen")
