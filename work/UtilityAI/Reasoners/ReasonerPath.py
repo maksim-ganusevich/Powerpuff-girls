@@ -46,26 +46,14 @@ class ReasonerPath(Reasoner):
                 return best_hex
 
         # tank is outside of range
-        path = Astar.find_path(curr_tank.position, goal)
-        max_weight, best_hex = self.eval_path(context, path, goal, use_range)
-
+        max_weight, best_hex = self.eval_path(context, goal)
         return best_hex
 
-    def eval_path(self, context: Context, path: List[Hex], goal, use_range: bool) -> (float, Hex):
+    def eval_path(self, context: Context, goal) -> (float, Hex):
         curr_tank = context.get_curr_tank()
-        if use_range:
-            min_range = curr_tank.get_range_min()
-            path = path[min_range:]  # slicing so destination is in range
-        # last path hex is curr_tank.position (path is reversed)
-        furthest_index = len(path) - curr_tank.sp if len(path) >= curr_tank.sp else 0
-        # slice to get hexes where tank can move based on sp
-        path = path[furthest_index:]
-
-        # add hexes that are equally distant from the origin to widen possible choices
-        all_possible_paths = []
-        for h in path:
-            all_possible_paths.extend(self.explore_with_same_dist(h, [h], curr_tank.position, goal))
-        return self.eval_possible_hexes(context, all_possible_paths)
+        all_possible_paths = Astar.find_all_paths(curr_tank.position, goal, curr_tank.sp)
+        max_weight, best_hex = self.eval_possible_hexes(context, all_possible_paths)
+        return max_weight, best_hex
 
     def eval_possible_hexes(self, context: Context, hexes: List[Hex]) -> (float, Hex):
         curr_tank = context.get_curr_tank()
@@ -81,14 +69,3 @@ class ReasonerPath(Reasoner):
             context.desired_hex = h
             return self.pick_action(context)[1]
         return 0
-
-    def explore_with_same_dist(self, h: Hex, hexes: List[Hex], origin: Hex, destination: Hex) -> List[Hex]:
-        o = Hex.distance(h, origin)
-        d = Hex.distance(h, destination)
-        for n in Map().get_free_neighbours(h):
-            n_o = Hex.distance(n, origin)
-            n_d = Hex.distance(n, destination)
-            if n not in hexes and n_o == o and n_d == d and Map().hex_is_free(n):
-                hexes.append(n)
-                self.explore_with_same_dist(n, hexes, origin, destination)
-        return hexes

@@ -13,3 +13,8 @@ from .ConsiderationAttacked import ConsiderationAttacked
 from .ConsiderationHexType import ConsiderationHexType
 from .ConsiderationCaptureSafe import ConsiderationCaptureSafe
 from .ConsiderationEnemyCapture import ConsiderationEnemyCapture
+from .ConsiderationBlockingWay import ConsiderationBlockingWay
+from .ConsiderationHexBlockingTeammate import ConsiderationHexBlockingTeammate
+from .ConsiderationHexAttackedByPrevious import ConsiderationHexAttackedByPrevious
+from .ConsiderationBaseStayingOnSpot import ConsiderationBaseStayingOnSpot
+from .ConsiderationNowhereToRun import ConsiderationNowhereToRun

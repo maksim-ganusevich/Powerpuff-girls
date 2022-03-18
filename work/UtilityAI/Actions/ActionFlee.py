@@ -1,9 +1,8 @@
 from typing import List
-from ..Considerations.Consideration import Consideration
-from work.UtilityAI.Context import Context
-from .Action import Action
+from . import Action
+from ..Considerations import Consideration
+from work.UtilityAI import Context
 from work.Map import Map
-from work.GameState import GameState
 
 
 class ActionFlee(Action):
@@ -13,10 +12,6 @@ class ActionFlee(Action):
 
     def execute(self, context: Context) -> None:
         curr_tank = context.get_curr_tank()
-        prev_pos = curr_tank.position
-        best_hex = context.path_reasoner.get_best_hex_around(context)
-        if curr_tank.move(best_hex):
-            Map().update_vehicle(prev_pos, curr_tank.position)
-            # update info for visualisation
-            GameState().vehicles[str(curr_tank.id)]["position"] = curr_tank.position.convert_to_dict()
-            context.player.move(curr_tank.id, curr_tank.position)
+        hexes_range = Map().get_hexes_in_range(curr_tank.position, curr_tank.sp)
+        max_weight, best_hex = context.path_reasoner.eval_possible_hexes(context, hexes_range)
+        return best_hex

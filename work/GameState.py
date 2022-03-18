@@ -15,6 +15,7 @@ class GameState(metaclass=Singleton):
         self.win_points = dict()
         self.catapult_usage = []
         self.max_catapult_usage = 3
+        self.attack_matrix_corrected = False
 
     def set_game_state(self, gs_response):
         self.num_players = gs_response["num_players"]
@@ -28,3 +29,4 @@ class GameState(metaclass=Singleton):
         self.winner = gs_response["winner"]
         self.win_points = gs_response["win_points"]
         self.catapult_usage = gs_response["catapult_usage"]
+        self.attack_matrix_corrected = False

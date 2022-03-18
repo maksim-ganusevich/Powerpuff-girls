@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 from typing import List, Dict, Tuple
 from work import Singleton
 from work import Player
@@ -51,11 +52,9 @@ class AI(metaclass=Singleton):
     def make_action(self, player: Player) -> None:
         player_tanks, enemy_tanks = self.get_tank_lists(player)
         player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
-        context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks, GameState().attack_matrix)
-        print("==================")
-        for i in range(len(player.tanks)):
-            context.update_curr_tank_index(i)
-            self.brain.act(context)
+        context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks)
+        self.brain.think(context)
+        self.brain.act(context)
 
     def send_turn(self) -> None:
         for player in self.players:
@@ -64,6 +63,12 @@ class AI(metaclass=Singleton):
             player.turn(send_r=False)
 
     def start_game(self) -> None:
+        if len(self.players) == 1:
+            self.multiplayer_game()
+        else:
+            self.singleplayer_game()
+
+    def singleplayer_game(self) -> None:
         self.players[0].get_state()  # initializes GameState singleton
         while True:
             if GameState().finished:
@@ -75,6 +80,28 @@ class AI(metaclass=Singleton):
                     self.send_turn()
                     pl.get_state()  # updates GameState singleton
                     break
+
+    def send_solo_turn(self):
+        self.send_turn()
+        while GameState().current_player_idx != self.players[0].id:
+            self.players[0].get_state()
+
+    def multiplayer_game(self) -> None:
+        pl = self.players[0]
+        pl.get_state()  # initializes GameState singleton
+        while True:
+            if GameState().finished:
+                self.finish_game()
+                break
+
+            if GameState().current_player_idx == pl.id:
+                self.make_action(pl)
+                self.send_turn()
+                pl.get_state()  # updates GameState singleton
+            else:
+                self.send_turn()
+                pl.get_state()
+                sleep(0.1)
 
     def finish_game(self) -> None:
         for player in self.players:
