@@ -1,7 +1,6 @@
 from . import Consideration
 from work.UtilityAI import Context
 from work.GameState import GameState
-from ..Curve import CurveRules
 
 
 class ConsiderationAttacked(Consideration):
@@ -14,6 +13,7 @@ class ConsiderationAttacked(Consideration):
                     count += 1
             if count > attacks_by_single_enemy:
                 attacks_by_single_enemy = count
+
         # curve slope depends on curr hp
-        self.rules = CurveRules(m=context.get_curr_tank().hp-0.7, inverse=True)
+        self.rules.m = context.get_curr_tank().hp-0.7
         return self.eval(attacks_by_single_enemy)

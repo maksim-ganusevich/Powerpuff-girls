@@ -12,7 +12,7 @@ class ConsiderationCaptureSafe(Consideration):
         curr_tank = context.get_curr_tank()
         c = ConsiderationHexAttacked(Curve.linear_quadratic)
         # getting utility of the best base hex
-        best_weight = 0.5  # default value if base not in reach
+        best_weight = 0.8  # default value if base not in reach
         for b in Map().base:
             if Hex.distance(curr_tank.position, b) <= curr_tank.sp:
                 context.desired_hex = b

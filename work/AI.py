@@ -52,11 +52,9 @@ class AI(metaclass=Singleton):
     def make_action(self, player: Player) -> None:
         player_tanks, enemy_tanks = self.get_tank_lists(player)
         player.tanks = sorted(player_tanks, key=lambda t: t[0])  # sort based on move order
-        context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks, GameState().attack_matrix)
-        print("==================")
-        for i in range(len(player.tanks)):
-            context.update_curr_tank_index(i)
-            self.brain.act(context)
+        context = Context(player, 0, [t[1] for t in player.tanks], enemy_tanks)
+        self.brain.think(context)
+        self.brain.act(context)
 
     def send_turn(self) -> None:
         for player in self.players:

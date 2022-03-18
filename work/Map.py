@@ -6,6 +6,7 @@ DIRECTIONS = [
     Hex(+1, 0, -1), Hex(+1, -1, 0), Hex(0, -1, +1),
     Hex(-1, 0, +1), Hex(-1, +1, 0), Hex(0, +1, -1),
 ]
+CENTER = Hex(0, 0, 0)
 
 
 class Map(metaclass=Singleton):
