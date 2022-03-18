@@ -12,31 +12,24 @@ A server game in the strategy genre.
 <br>
 ***Brief description of the bot:***
 <br>
-AI is based on Utility AI system. The key to decision making is to calculate a utility score for every action the AI agent can take and then choose the action with the highest score.
+Our intelligence takes into account the position, life points, capture points and other parameters of enemy tanks and controls the behavior of its equipment
 ***
 ***Installation:***
 <br>
 First you have to download this repository.
 Now go to the root folder of the project and run the following command:
 <br>
-```
-pip install -r requirements.txt
-```
+```pip install -r requirements.txt```
 ***
 ***how to launch***
 <br>
 Run the command in the root folder of the project without arguments to run a test game with 3 players controlled by one bot:
 
-```
-python main.py
-```
+```python main.py```
 
 Run the command in the root folder of the project with optional arguments to run a test game with 1 players:
 
-```
-python main.py -n [player name] -p [password] -g [game name] -np [number of players] -nt [number of turns] -obs [0/1 is observer]
-```
-##### competitive game mode (1 player): #####
+```python main.py -n [player name] -p [password] -g [game name] -np [number of players] -nt [number of turns] -obs [0/1 is observer]```
 ***
 ***Our team:***
 <br>

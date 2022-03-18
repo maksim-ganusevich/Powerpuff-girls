@@ -2,13 +2,16 @@ from threading import Thread
 import sys
 import argparse
 import random
+from time import sleep
+
 from work.AI import AI
 from work.Player import Player
 from work.Visualisation import Graphics
+from work.GameState import GameState
 
 
 def createParser():
-    parser = argparse.ArgumentParser(description='A tutorial of argparse!')
+    parser = argparse.ArgumentParser(description='Game bot launch parser')
     parser.add_argument("-n", default=None, type=str, help="Your name")
     parser.add_argument("-p", default="", type=str, help="Your password")
     parser.add_argument("-g", default=None, type=str, help="Game name")
@@ -16,7 +19,6 @@ def createParser():
     parser.add_argument("-np", default=1, type=int, help="Number of players")
     parser.add_argument("-obs", default=False, type=bool, help="Are you observer?")
     return parser
-
 
 
 def test_game():
@@ -35,14 +37,17 @@ def scoring_game(player_name, password, game_name, num_turns, num_players, is_ob
     player = Player(player_name, password, is_observer)
     ai_ = AI([player])
     ai_.connect(game_name=game_name, num_turns=num_turns, num_players=num_players)
-    ai_.send_turn()
+    # ai_.send_turn()
+    while len(GameState().players) != 3:
+        sleep(0.05)
+        player.get_state()
     th_ = Thread(target=ai_.start_game)
     th_.start()
     graphics = Graphics()
     graphics.render()
 
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) == 1:
         test_game()
     else:
@@ -51,3 +56,7 @@ if __name__ == "__main__":
         scoring_game(player_name=args.n, password=args.p,
                      game_name=args.g, num_players=args.np,
                      num_turns=args.nt, is_observer=args.obs)
+
+
+if __name__ == "__main__":
+    main()

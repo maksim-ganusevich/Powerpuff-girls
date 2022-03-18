@@ -62,29 +62,14 @@ class AI(metaclass=Singleton):
         for player in self.players:
             player.turn(send_r=False)
 
-    def start_game(self) -> None:
-        if len(self.players) == 1:
-            self.multiplayer_game()
-        else:
-            self.singleplayer_game()
-
-    def singleplayer_game(self) -> None:
-        self.players[0].get_state()  # initializes GameState singleton
-        while True:
-            if GameState().finished:
-                self.finish_game()
-                break
-            for pl in self.players:
-                if GameState().current_player_idx == pl.id:
-                    self.make_action(pl)
-                    self.send_turn()
-                    pl.get_state()  # updates GameState singleton
-                    break
-
     def send_solo_turn(self):
         self.send_turn()
         while GameState().current_player_idx != self.players[0].id:
             self.players[0].get_state()
+
+    def finish_game(self) -> None:
+        for player in self.players:
+            player.logout()
 
     def multiplayer_game(self) -> None:
         pl = self.players[0]
@@ -103,6 +88,21 @@ class AI(metaclass=Singleton):
                 pl.get_state()
                 sleep(0.1)
 
-    def finish_game(self) -> None:
-        for player in self.players:
-            player.logout()
+    def singleplayer_game(self) -> None:
+        self.players[0].get_state()  # initializes GameState singleton
+        while True:
+            if GameState().finished:
+                self.finish_game()
+                break
+            for pl in self.players:
+                if GameState().current_player_idx == pl.id:
+                    self.make_action(pl)
+                    self.send_turn()
+                    pl.get_state()  # updates GameState singleton
+                    break
+
+    def start_game(self) -> None:
+        if len(self.players) == 1:
+            self.multiplayer_game()
+        else:
+            self.singleplayer_game()
