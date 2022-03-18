@@ -328,7 +328,6 @@ class Brain:
             if target_id_we_want_to_shoot:
                 # update attack matrix for neutrality rule
                 GameState().attack_matrix[str(context.player.id)].append(target_id_we_want_to_shoot)
-                # save shoot action so it's not recalculated later
 
         # flag for considerations to use neutrality rule
         GameState().attack_matrix_corrected = True
@@ -337,7 +336,6 @@ class Brain:
     def act(self, context: Context) -> None:
         for i in range(len(context.player.tanks)):
             context.update_curr_tank_index(i)
-            # otherwise calculate it using updated attack matrix
             reasoner_main, reasoner_target = self.get_reasoner(repr(type(context.get_curr_tank())))
 
             target_index = reasoner_target.get_target_index(context)
@@ -350,14 +348,13 @@ class Brain:
 
     @staticmethod
     def print_action_info(context: Context, best_action):
-        if context.player.name == "Carlos":
-            print()
-            print("curr: " + repr(type(context.get_curr_tank())))
-            print("target: " + repr(type(context.get_target())) + " id: " + str(context.get_target().owner))
-            print("distance: " + str(Hex.distance(context.get_curr_tank().position, context.get_target().position)))
-            print("Range: " + str(context.get_curr_tank().shoot_range_max) + " bonus: " + str(
-                context.get_curr_tank().shoot_range_bonus))
-            print("Action: " + repr(type(best_action)))
-            print("Attack matrix: " + str(GameState().attack_matrix))
-            print("Curr turn: " + str(GameState().current_turn))
-            print()
+        print()
+        print("curr: " + repr(type(context.get_curr_tank())))
+        print("target: " + repr(type(context.get_target())) + " id: " + str(context.get_target().owner))
+        print("distance: " + str(Hex.distance(context.get_curr_tank().position, context.get_target().position)))
+        print("Range: " + str(context.get_curr_tank().shoot_range_max) + " bonus: " + str(
+            context.get_curr_tank().shoot_range_bonus))
+        print("Action: " + repr(type(best_action)))
+        print("Attack matrix: " + str(GameState().attack_matrix))
+        print("Curr turn: " + str(GameState().current_turn))
+        print()
